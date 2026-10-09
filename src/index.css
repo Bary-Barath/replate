@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap');
+
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+@layer base {
+  body {
+    @apply font-sans bg-surface-ivory text-text-primary antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display text-text-primary font-bold tracking-tight;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center bg-brand-forest text-surface-white font-medium px-6 py-3 rounded-xl transition-all duration-200 hover:bg-brand-deep hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:pointer-events-none;
+  }
+  
+  .btn-secondary {
+    @apply inline-flex items-center justify-center bg-surface-white text-text-primary border border-border font-medium px-6 py-3 rounded-xl transition-all duration-200 hover:border-brand-forest hover:text-brand-forest active:bg-surface-ivory disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .card {
+    @apply bg-surface-white rounded-2xl border border-border overflow-hidden transition-all duration-300;
+  }
+  
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold;
+  }
+}
