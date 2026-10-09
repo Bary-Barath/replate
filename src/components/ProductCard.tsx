@@ -1,14 +1,17 @@
 import React from 'react';
 import { Heart, ShoppingCart, Clock, MapPin } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { Product } from '../types';
 import { formatDistanceToNow, parseISO } from 'date-fns';
+import { useAppContext } from '../context/AppContext';
 
 interface ProductCardProps {
   product: Product;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+  const { addToCart } = useAppContext();
+  const navigate = useNavigate();
   const savings = product.originalPrice - product.rescuePrice;
   const timeRemaining = formatDistanceToNow(parseISO(product.bestBefore), { addSuffix: true });
   
@@ -67,7 +70,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               className="btn-primary py-2.5 px-4 flex-1 text-sm flex items-center justify-center gap-2 group/btn"
               onClick={(e) => {
                 e.preventDefault();
-                // Add to cart logic
+                addToCart(product, 1);
+                // Optional: Show a toast or navigate
               }}
             >
               <ShoppingCart size={16} strokeWidth={2.5} className="transition-transform group-hover/btn:scale-110" />

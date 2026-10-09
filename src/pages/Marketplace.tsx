@@ -1,11 +1,12 @@
 import { useState, useMemo } from 'react';
 import { Search, Filter, SlidersHorizontal, X } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
-import { mockProducts } from '../mockData';
+import { useAppContext } from '../context/AppContext';
 
 const categories = ['All', 'Bakery', 'Fruits & Vegetables', 'Dairy', 'Meals', 'Beverages', 'Snacks'];
 
 const Marketplace = () => {
+  const { products } = useAppContext();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -14,7 +15,7 @@ const Marketplace = () => {
   const [minDiscount, setMinDiscount] = useState<number>(0);
   
   const filteredProducts = useMemo(() => {
-    return mockProducts.filter(product => {
+    return products.filter(product => {
       const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                             product.sellerName.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;

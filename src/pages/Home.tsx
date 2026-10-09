@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Leaf, ShieldCheck, Tag, TrendingDown } from 'lucide-react';
+import { ArrowRight, Leaf, ShieldCheck, Tag, TrendingDown, Clock } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
-import { mockProducts } from '../mockData';
+import { useAppContext } from '../context/AppContext';
 
 const Home = () => {
+  const { products } = useAppContext();
+  const topDeals = products.slice(0, 4);
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
@@ -107,7 +109,7 @@ const Home = () => {
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {mockProducts.map(product => (
+            {topDeals.map(product => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>

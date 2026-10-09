@@ -1,12 +1,14 @@
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Heart, MapPin, Clock, Info, ShieldCheck } from 'lucide-react';
-import { mockProducts } from '../mockData';
+import { useAppContext } from '../context/AppContext';
 import { format, parseISO, formatDistanceToNow } from 'date-fns';
 
 const ProductDetails = () => {
   const { id } = useParams<{ id: string }>();
-  const product = mockProducts.find(p => p.id === id) || mockProducts[0]; // fallback for demo
+  const { products, addToCart } = useAppContext();
+  const navigate = useNavigate();
+  const product = products.find(p => p.id === id) || products[0]; // fallback for demo
   const [quantity, setQuantity] = useState(1);
   
   if (!product) return <div>Product not found</div>;
@@ -116,8 +118,22 @@ const ProductDetails = () => {
                 </div>
                 
                 <div className="flex gap-4">
-                  <button className="btn-secondary flex-1 py-4 text-lg">Add to Cart</button>
-                  <button className="btn-primary flex-1 py-4 text-lg flex items-center justify-center gap-2">
+                  <button 
+                    className="btn-secondary flex-1 py-4 text-lg"
+                    onClick={() => {
+                      addToCart(product, quantity);
+                      // Toast could go here
+                    }}
+                  >
+                    Add to Cart
+                  </button>
+                  <button 
+                    className="btn-primary flex-1 py-4 text-lg flex items-center justify-center gap-2"
+                    onClick={() => {
+                      addToCart(product, quantity);
+                      navigate('/checkout');
+                    }}
+                  >
                     <ShoppingCart size={20} /> Buy Now
                   </button>
                 </div>

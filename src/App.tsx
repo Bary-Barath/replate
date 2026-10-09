@@ -4,6 +4,8 @@ import Home from './pages/Home';
 import Marketplace from './pages/Marketplace';
 import ProductDetails from './pages/ProductDetails';
 import SellerDashboard from './pages/SellerDashboard';
+import Cart from './pages/Cart';
+import Checkout from './pages/Checkout';
 
 function App() {
   return (
@@ -14,7 +16,8 @@ function App() {
           <Route path="explore" element={<Marketplace />} />
           <Route path="product/:id" element={<ProductDetails />} />
           <Route path="seller" element={<SellerDashboard />} />
-          {/* <Route path="admin" element={<AdminDashboard />} /> */}
+          <Route path="cart" element={<Cart />} />
+          <Route path="checkout" element={<Checkout />} />
         </Route>
       </Routes>
     </Router>

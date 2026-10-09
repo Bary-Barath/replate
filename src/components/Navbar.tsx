@@ -1,7 +1,12 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Search, Heart, ShoppingCart, User, Menu } from 'lucide-react';
+import { useAppContext } from '../context/AppContext';
 
 const Navbar = () => {
+  const { cart } = useAppContext();
+  const navigate = useNavigate();
+  const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
+
   return (
     <header className="bg-surface-white/80 backdrop-blur-md border-b border-border/40 sticky top-0 z-50">
       <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
@@ -13,9 +18,9 @@ const Navbar = () => {
             
             <nav className="hidden md:flex items-center gap-8">
               <Link to="/explore" className="text-sm font-semibold text-text-primary hover:text-brand-forest transition-colors">Explore</Link>
-              <Link to="/rescue" className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors">Rescue Deals</Link>
-              <Link to="/how-it-works" className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors">How It Works</Link>
-              <Link to="/impact" className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors">Impact</Link>
+              <Link to="/explore" className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors">Rescue Deals</Link>
+              <Link to="/" className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors">How It Works</Link>
+              <Link to="/" className="text-sm font-medium text-text-secondary hover:text-text-primary transition-colors">Impact</Link>
             </nav>
           </div>
 
@@ -33,9 +38,13 @@ const Navbar = () => {
               <button className="hidden sm:block text-text-primary hover:text-brand-forest transition-colors">
                 <Heart size={20} strokeWidth={2.5} />
               </button>
-              <button className="relative text-text-primary hover:text-brand-forest transition-colors">
+              <button onClick={() => navigate('/cart')} className="relative text-text-primary hover:text-brand-forest transition-colors">
                 <ShoppingCart size={20} strokeWidth={2.5} />
-                <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-brand-forest text-surface-white flex items-center justify-center rounded-full text-[10px] font-bold">2</span>
+                {cartItemCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-brand-forest text-surface-white flex items-center justify-center rounded-full text-[10px] font-bold">
+                    {cartItemCount}
+                  </span>
+                )}
               </button>
               <button className="hidden sm:block text-text-primary hover:text-brand-forest transition-colors">
                 <User size={20} strokeWidth={2.5} />

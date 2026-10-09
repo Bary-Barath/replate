@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { Package, TrendingUp, DollarSign, Clock, AlertCircle } from 'lucide-react';
 import { calculateDiscount } from '../utils/discountEngine';
-
+import { useAppContext } from '../context/AppContext';
+import { useNavigate } from 'react-router-dom';
 
 const SellerDashboard = () => {
+  const { addProduct } = useAppContext();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
 
   return (
@@ -206,7 +209,29 @@ const AddProductForm = () => {
 
             <div className="flex gap-4 mt-6">
               <button className="btn-secondary flex-1" onClick={() => setStep(2)}>Back</button>
-              <button className="btn-primary flex-1">Publish Listing</button>
+              <button 
+                className="btn-primary flex-1"
+                onClick={() => {
+                  const newProduct = {
+                    id: Math.random().toString(36).substr(2, 9),
+                    name: formData.name,
+                    sellerName: 'FreshBake Bakery',
+                    originalPrice: Number(formData.originalPrice),
+                    rescuePrice: recommendation?.recommendedRescuePrice || 0,
+                    discountPercentage: recommendation?.recommendedDiscountPercentage || 0,
+                    bestBefore: formData.bestBefore ? new Date(formData.bestBefore).toISOString() : new Date().toISOString(),
+                    availableQuantity: Number(formData.quantity),
+                    imageUrl: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&q=80&w=800',
+                    category: formData.category,
+                    distance: '0.5 km',
+                    isEligibleForSale: true
+                  };
+                  addProduct(newProduct);
+                  setActiveTab('overview');
+                  setStep(1);
+                  setFormData({ name: '', category: 'Bakery', originalPrice: '', quantity: '', bestBefore: '' });
+                }}
+              >Publish Listing</button>
             </div>
           </div>
         )}
