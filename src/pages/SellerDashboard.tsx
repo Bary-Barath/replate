@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Package, TrendingUp, DollarSign, Clock, AlertCircle } from 'lucide-react';
 import { calculateDiscount } from '../utils/discountEngine';
-import { format } from 'date-fns';
+
 
 const SellerDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');

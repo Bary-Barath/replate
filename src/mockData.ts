@@ -1,5 +1,5 @@
 import type { Product } from './types';
-import { addDays, subDays } from 'date-fns';
+import { addDays } from 'date-fns';
 
 export const mockProducts: Product[] = [
   {
