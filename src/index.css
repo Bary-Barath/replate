@@ -15,18 +15,18 @@
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center bg-brand-forest text-surface-white font-medium px-6 py-3 rounded-xl transition-all duration-200 hover:bg-brand-deep hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center bg-text-primary text-surface-white font-medium px-6 py-3.5 rounded-lg transition-all duration-300 hover:bg-brand-forest hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:pointer-events-none tracking-wide text-sm;
   }
   
   .btn-secondary {
-    @apply inline-flex items-center justify-center bg-surface-white text-text-primary border border-border font-medium px-6 py-3 rounded-xl transition-all duration-200 hover:border-brand-forest hover:text-brand-forest active:bg-surface-ivory disabled:opacity-50 disabled:pointer-events-none;
+    @apply inline-flex items-center justify-center bg-transparent text-text-primary border border-border font-medium px-6 py-3.5 rounded-lg transition-all duration-300 hover:border-brand-forest hover:text-brand-forest active:bg-surface-ivory disabled:opacity-50 disabled:pointer-events-none tracking-wide text-sm;
   }
 
   .card {
-    @apply bg-surface-white rounded-2xl border border-border overflow-hidden transition-all duration-300;
+    @apply bg-surface-white rounded-lg border border-border/60 overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-brand-forest/5 hover:border-border;
   }
   
   .badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold;
+    @apply inline-flex items-center px-2.5 py-1 rounded-sm text-[10px] uppercase font-bold tracking-widest;
   }
 }

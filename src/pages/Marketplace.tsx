@@ -27,42 +27,42 @@ const Marketplace = () => {
 
   return (
     <div className="bg-surface-ivory min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-[1440px] mx-auto px-6 lg:px-12 py-12">
         
         {/* Header & Search */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 border-b border-border/50 pb-8">
           <div>
-            <h1 className="text-3xl font-display font-bold text-text-primary mb-2">Explore Rescue Deals</h1>
-            <p className="text-text-secondary">Find great food near you at better prices.</p>
+            <h1 className="text-4xl font-display font-extrabold text-text-primary mb-3 tracking-tight">Explore Deals</h1>
+            <p className="text-text-secondary text-lg">Find great food near you at better prices.</p>
           </div>
           
           <div className="flex items-center gap-3 w-full md:w-auto">
-            <div className="relative flex-grow md:w-80">
+            <div className="relative flex-grow md:w-96">
               <input 
                 type="text" 
                 placeholder="Search food or businesses..." 
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-border bg-surface-white focus:outline-none focus:ring-2 focus:ring-brand-forest/50 transition-all shadow-sm"
+                className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-border/80 bg-surface-white focus:outline-none focus:border-brand-forest focus:ring-1 focus:ring-brand-forest transition-all shadow-sm text-sm"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <Search className="absolute left-3 top-3.5 text-text-secondary" size={20} />
+              <Search className="absolute left-4 top-3.5 text-text-secondary" size={20} strokeWidth={2.5} />
             </div>
             <button 
-              className="p-3 bg-surface-white border border-border rounded-xl text-text-secondary hover:text-brand-forest hover:border-brand-forest transition-colors shadow-sm md:hidden"
+              className="p-3.5 bg-surface-white border border-border/80 rounded-xl text-text-secondary hover:text-text-primary hover:border-text-primary transition-colors shadow-sm md:hidden"
               onClick={() => setIsFilterOpen(true)}
             >
-              <SlidersHorizontal size={20} />
+              <SlidersHorizontal size={20} strokeWidth={2.5} />
             </button>
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex flex-col lg:flex-row gap-12">
           {/* Sidebar / Filters (Desktop) */}
-          <div className={`fixed inset-0 z-50 bg-surface-white lg:static lg:block lg:w-64 lg:bg-transparent lg:z-auto transition-transform duration-300 ${isFilterOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
-            <div className="h-full flex flex-col p-6 lg:p-0">
-              <div className="flex justify-between items-center mb-6 lg:hidden">
-                <h2 className="text-xl font-bold">Filters</h2>
-                <button onClick={() => setIsFilterOpen(false)} className="p-2 rounded-full hover:bg-surface-ivory">
+          <div className={`fixed inset-0 z-50 bg-surface-white lg:static lg:block lg:w-72 lg:bg-transparent lg:z-auto transition-transform duration-300 ${isFilterOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+            <div className="h-full flex flex-col p-8 lg:p-0">
+              <div className="flex justify-between items-center mb-8 lg:hidden">
+                <h2 className="text-2xl font-bold tracking-tight">Filters</h2>
+                <button onClick={() => setIsFilterOpen(false)} className="p-2 rounded-full hover:bg-surface-ivory transition-colors">
                   <X size={24} />
                 </button>
               </div>

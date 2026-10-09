@@ -7,58 +7,59 @@ const Home = () => {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative bg-surface-ivory overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center py-16 lg:py-24">
-            <div className="z-10">
-              <span className="text-brand-fresh font-bold tracking-wider text-sm uppercase mb-4 block">
+      <section className="relative bg-surface-white overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-brand-forest/5 via-surface-white to-surface-white"></div>
+        <div className="max-w-[1440px] mx-auto px-6 lg:px-12 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center py-20 lg:py-32">
+            <div className="max-w-xl">
+              <span className="inline-block py-1.5 px-3 rounded-full bg-brand-forest/10 text-brand-forest font-bold tracking-wider text-[10px] uppercase mb-6">
                 Food Rescue Marketplace
               </span>
-              <h1 className="text-5xl md:text-6xl font-display font-extrabold text-brand-deep leading-tight mb-6">
+              <h1 className="text-5xl md:text-7xl font-display font-extrabold text-text-primary leading-[1.1] mb-6 tracking-tight">
                 Good food shouldn't become waste.
               </h1>
-              <p className="text-xl text-text-secondary mb-2 font-medium">
-                Rescue it. Save money. Make an impact.
-              </p>
-              <p className="text-lg text-text-secondary mb-8 max-w-lg">
+              <p className="text-xl text-text-secondary mb-10 leading-relaxed">
                 Discover quality food from local businesses at up to 75% off before it reaches its applicable sale deadline.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link to="/explore" className="btn-primary text-lg px-8 py-4 flex items-center justify-center gap-2">
-                  Explore Rescue Deals <ArrowRight size={20} />
+                <Link to="/explore" className="btn-primary text-base px-8 py-4 flex items-center justify-center gap-2">
+                  Explore Rescue Deals <ArrowRight size={18} />
                 </Link>
-                <Link to="/seller" className="btn-secondary text-lg px-8 py-4">
+                <Link to="/seller" className="btn-secondary text-base px-8 py-4">
                   I'm a Food Business
                 </Link>
               </div>
             </div>
             
-            <div className="relative h-[400px] lg:h-[600px] rounded-3xl overflow-hidden shadow-2xl">
+            <div className="relative h-[500px] lg:h-[700px] rounded-2xl overflow-hidden shadow-2xl shadow-brand-forest/10">
               <img 
                 src="https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&q=80&w=1200" 
                 alt="Fresh bakery items" 
                 className="absolute inset-0 w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-brand-deep/80 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-text-primary/60 via-transparent to-transparent"></div>
               
               {/* Floating Offer Card */}
-              <div className="absolute bottom-8 left-8 right-8 bg-surface-white/95 backdrop-blur rounded-2xl p-4 shadow-lg flex items-center gap-4 transform transition-transform hover:scale-[1.02]">
+              <div className="absolute bottom-8 left-8 right-8 bg-surface-white/95 backdrop-blur-md rounded-xl p-5 shadow-xl flex items-center gap-5 transform transition-transform hover:scale-[1.02]">
                 <img 
                   src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&q=80&w=200" 
                   alt="Chocolate Croissant" 
-                  className="w-20 h-20 rounded-xl object-cover"
+                  className="w-24 h-24 rounded-lg object-cover"
                 />
                 <div className="flex-grow">
-                  <h4 className="font-bold text-text-primary">Chocolate Croissant</h4>
-                  <div className="flex items-end gap-2 mt-1">
-                    <span className="text-xl font-bold text-brand-forest">₹39</span>
-                    <span className="text-sm text-text-secondary line-through mb-0.5">₹120</span>
+                  <h4 className="font-bold text-lg text-text-primary leading-tight">Chocolate Croissant</h4>
+                  <p className="text-sm text-text-secondary mb-2">La Petite Boulangerie</p>
+                  <div className="flex items-baseline gap-2 mt-1">
+                    <span className="text-2xl font-extrabold text-brand-forest">₹39</span>
+                    <span className="text-sm text-text-secondary line-through font-medium">₹120</span>
                   </div>
                 </div>
-                <div className="text-right flex flex-col items-end">
-                  <span className="badge bg-accent-amber text-surface-white mb-2">68% OFF</span>
-                  <span className="text-xs font-semibold text-text-secondary">4 days left</span>
+                <div className="text-right flex flex-col items-end justify-between h-20">
+                  <span className="badge bg-text-primary text-surface-white">68% OFF</span>
+                  <span className="text-xs font-bold text-accent-amber uppercase tracking-widest flex items-center gap-1">
+                    <Clock size={12} strokeWidth={3} /> 4 Days
+                  </span>
                 </div>
               </div>
             </div>
@@ -67,81 +68,81 @@ const Home = () => {
       </section>
 
       {/* Trust Indicators */}
-      <section className="bg-brand-forest text-surface-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div className="flex flex-col items-center gap-3">
-              <Tag size={32} className="text-accent-amber" />
-              <h4 className="font-semibold text-lg">Up to 75% Off</h4>
+      <section className="bg-surface-ivory border-y border-border/50 py-16">
+        <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-12 text-center divide-x divide-border/50">
+            <div className="flex flex-col items-center gap-4">
+              <Tag size={28} className="text-brand-forest" strokeWidth={1.5} />
+              <h4 className="font-semibold text-text-primary">Up to 75% Off</h4>
             </div>
-            <div className="flex flex-col items-center gap-3">
-              <ShieldCheck size={32} className="text-brand-fresh" />
-              <h4 className="font-semibold text-lg">Transparent Dates</h4>
+            <div className="flex flex-col items-center gap-4">
+              <ShieldCheck size={28} className="text-brand-forest" strokeWidth={1.5} />
+              <h4 className="font-semibold text-text-primary">Transparent Dates</h4>
             </div>
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-8 h-8 rounded-full border-2 border-surface-ivory flex items-center justify-center">
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-7 h-7 rounded-full border-[1.5px] border-brand-forest flex items-center justify-center text-brand-forest">
                 <span className="font-bold text-sm">₹</span>
               </div>
-              <h4 className="font-semibold text-lg">Trusted Local Businesses</h4>
+              <h4 className="font-semibold text-text-primary">Local Businesses</h4>
             </div>
-            <div className="flex flex-col items-center gap-3">
-              <TrendingDown size={32} className="text-accent-amber" />
-              <h4 className="font-semibold text-lg">Less Food Waste</h4>
+            <div className="flex flex-col items-center gap-4">
+              <TrendingDown size={28} className="text-brand-forest" strokeWidth={1.5} />
+              <h4 className="font-semibold text-text-primary">Less Food Waste</h4>
             </div>
           </div>
         </div>
       </section>
 
       {/* Rescue Deals */}
-      <section className="py-20 bg-surface-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-end mb-10">
+      <section className="py-24 bg-surface-white">
+        <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
             <div>
-              <h2 className="text-3xl md:text-4xl font-display font-bold text-text-primary mb-2">Good food. Better prices.</h2>
-              <p className="text-text-secondary text-lg">Discover today's best rescue deals.</p>
+              <h2 className="text-4xl font-display font-extrabold text-text-primary mb-3 tracking-tight">Good food. Better prices.</h2>
+              <p className="text-text-secondary text-lg">Discover today's best rescue deals near you.</p>
             </div>
-            <Link to="/explore" className="hidden md:flex items-center gap-2 text-brand-forest font-semibold hover:text-brand-deep transition-colors">
-              View all deals <ArrowRight size={20} />
+            <Link to="/explore" className="hidden md:flex items-center gap-2 text-text-primary font-bold hover:text-brand-forest transition-colors text-sm uppercase tracking-wider">
+              View all deals <ArrowRight size={16} strokeWidth={2.5} />
             </Link>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {mockProducts.map(product => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
           
-          <div className="mt-8 md:hidden">
+          <div className="mt-10 md:hidden">
             <Link to="/explore" className="btn-secondary w-full">View all deals</Link>
           </div>
         </div>
       </section>
 
       {/* How It Works */}
-      <section className="py-20 bg-surface-ivory border-t border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-display font-bold text-text-primary mb-4">How RePlate Works</h2>
+      <section className="py-32 bg-surface-ivory">
+        <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl font-display font-extrabold text-text-primary mb-4 tracking-tight">How RePlate Works</h2>
             <p className="text-text-secondary text-lg max-w-2xl mx-auto">A simple way to save money and the planet simultaneously.</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-brand-forest text-surface-white rounded-2xl flex items-center justify-center text-2xl font-bold mx-auto mb-6 shadow-lg">01</div>
-              <h3 className="text-xl font-bold mb-3">Businesses list surplus</h3>
-              <p className="text-text-secondary leading-relaxed">Local businesses list eligible surplus food that hasn't reached its sale deadline.</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-16 relative">
+            <div className="hidden md:block absolute top-8 left-[16%] right-[16%] h-px bg-border"></div>
+            
+            <div className="text-center relative z-10">
+              <div className="w-16 h-16 bg-surface-white text-brand-forest border border-border/80 rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-8 shadow-sm">01</div>
+              <h3 className="text-xl font-bold mb-4 text-text-primary">Businesses list surplus</h3>
+              <p className="text-text-secondary leading-relaxed max-w-xs mx-auto">Local businesses list eligible surplus food that hasn't reached its sale deadline.</p>
             </div>
-            <div className="text-center relative">
-              <div className="hidden md:block absolute top-8 left-0 w-full border-t-2 border-dashed border-border -z-10"></div>
-              <div className="w-16 h-16 bg-brand-forest text-surface-white rounded-2xl flex items-center justify-center text-2xl font-bold mx-auto mb-6 shadow-lg">02</div>
-              <h3 className="text-xl font-bold mb-3">Smart pricing recommends</h3>
-              <p className="text-text-secondary leading-relaxed">Our engine recommends a rescue discount based on the remaining shelf life.</p>
+            <div className="text-center relative z-10">
+              <div className="w-16 h-16 bg-surface-white text-brand-forest border border-border/80 rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-8 shadow-sm">02</div>
+              <h3 className="text-xl font-bold mb-4 text-text-primary">Smart pricing</h3>
+              <p className="text-text-secondary leading-relaxed max-w-xs mx-auto">Our engine recommends a rescue discount based on the remaining shelf life.</p>
             </div>
-            <div className="text-center relative">
-              <div className="hidden md:block absolute top-8 left-0 w-full border-t-2 border-dashed border-border -z-10"></div>
-              <div className="w-16 h-16 bg-brand-forest text-surface-white rounded-2xl flex items-center justify-center text-2xl font-bold mx-auto mb-6 shadow-lg">03</div>
-              <h3 className="text-xl font-bold mb-3">Customers purchase</h3>
-              <p className="text-text-secondary leading-relaxed">You discover and buy quality products at a fraction of the price before the deadline.</p>
+            <div className="text-center relative z-10">
+              <div className="w-16 h-16 bg-surface-white text-brand-forest border border-border/80 rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-8 shadow-sm">03</div>
+              <h3 className="text-xl font-bold mb-4 text-text-primary">Customers rescue</h3>
+              <p className="text-text-secondary leading-relaxed max-w-xs mx-auto">You discover and buy quality products at a fraction of the price before the deadline.</p>
             </div>
           </div>
         </div>
