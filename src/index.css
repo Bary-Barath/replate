@@ -5,8 +5,9 @@
 
 @layer base {
   body {
-    @apply font-sans bg-brand-deep text-text-primary antialiased;
-    background-image: radial-gradient(circle at 8% 0%, rgba(98, 214, 165, 0.12), transparent 32rem), radial-gradient(circle at 95% 12%, rgba(185, 247, 122, 0.08), transparent 28rem);
+    @apply font-sans bg-surface-ivory text-text-primary antialiased;
+    background-image: radial-gradient(circle at 8% 0%, rgba(37, 133, 90, 0.16), transparent 32rem), radial-gradient(circle at 95% 12%, rgba(120, 174, 132, 0.16), transparent 28rem), linear-gradient(135deg, #F3F8F2 0%, #E7F1E8 48%, #F7FBF6 100%);
+    background-attachment: fixed;
     min-width: 320px;
   }
 
@@ -15,20 +16,20 @@
   }
 
   ::selection { @apply bg-brand-lime text-brand-deep; }
-  :focus-visible { @apply outline-2 outline-offset-2 outline-brand-lime; }
+  :focus-visible { @apply outline-2 outline-offset-2 outline-brand-forest; }
 }
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center bg-brand-lime text-brand-deep font-bold px-8 py-3.5 rounded-full transition-all duration-300 hover:bg-surface-white hover:text-brand-lime hover:shadow-[0_0_28px_rgba(185,247,122,0.28)] active:scale-95 disabled:opacity-50 disabled:pointer-events-none tracking-wide text-sm;
+    @apply inline-flex items-center justify-center bg-brand-forest text-white font-bold px-8 py-3.5 rounded-full transition-all duration-300 hover:bg-[#1B6945] hover:shadow-[0_10px_24px_rgba(37,133,90,0.20)] active:scale-95 disabled:opacity-50 disabled:pointer-events-none tracking-wide text-sm;
   }
   
   .btn-secondary {
-    @apply inline-flex items-center justify-center bg-surface-glass backdrop-blur-md text-text-primary border border-border font-semibold px-8 py-3.5 rounded-full transition-all duration-300 hover:bg-surface-white hover:border-brand-fresh hover:text-brand-fresh active:scale-95 disabled:opacity-50 disabled:pointer-events-none tracking-wide text-sm;
+    @apply inline-flex items-center justify-center bg-surface-glass backdrop-blur-md text-brand-forest border border-border font-semibold px-8 py-3.5 rounded-full transition-all duration-300 hover:bg-surface-white hover:border-brand-forest hover:text-brand-forest active:scale-95 disabled:opacity-50 disabled:pointer-events-none tracking-wide text-sm;
   }
 
   .card {
-    @apply bg-surface-glass backdrop-blur-xl rounded-3xl border border-border/70 shadow-[0_18px_60px_rgba(0,0,0,0.18)] overflow-hidden transition-all duration-300 hover:shadow-[0_22px_70px_rgba(0,0,0,0.28)] hover:-translate-y-1 hover:border-brand-fresh/40;
+    @apply bg-surface-glass backdrop-blur-xl rounded-3xl border border-border/70 shadow-[0_8px_32px_rgba(35,88,58,0.08)] overflow-hidden transition-all duration-300 hover:shadow-[0_14px_38px_rgba(35,88,58,0.13)] hover:-translate-y-1 hover:border-brand-forest/30;
   }
   
   .badge {
@@ -36,10 +37,14 @@
   }
 
   .glass-panel {
-    @apply bg-surface-glass backdrop-blur-xl border border-border/70 shadow-[0_18px_60px_rgba(0,0,0,0.18)];
+    @apply bg-surface-glass backdrop-blur-xl border border-border/70 shadow-[0_8px_32px_rgba(35,88,58,0.08)];
   }
 
   .eyebrow {
-    @apply text-brand-lime uppercase tracking-[0.22em] text-[10px] font-extrabold;
+    @apply text-brand-forest uppercase tracking-[0.22em] text-[10px] font-extrabold;
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
 }

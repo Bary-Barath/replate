@@ -8,28 +8,28 @@ export default {
     extend: {
       colors: {
         brand: {
-          forest: '#174D3A',
-          deep: '#061713',
-          fresh: '#62D6A5',
-          lime: '#B9F77A',
-          teal: '#2FBF9F',
+          forest: '#25855A',
+          deep: '#173C2B',
+          fresh: '#25855A',
+          lime: '#DDF4E4',
+          teal: '#4EA879',
         },
         surface: {
-          ivory: '#061713',
-          white: '#102C23',
-          glass: 'rgba(255,255,255,0.07)',
+          ivory: '#F3F8F2',
+          white: 'rgba(255,255,255,0.82)',
+          glass: 'rgba(255,255,255,0.58)',
         },
         text: {
-          primary: '#F4FFF8',
-          secondary: '#A9BEB4',
+          primary: '#173C2B',
+          secondary: '#64786C',
         },
         border: {
-          DEFAULT: 'rgba(255,255,255,0.16)',
+          DEFAULT: 'rgba(255,255,255,0.85)',
         },
         accent: {
-          amber: '#F0B44D',
-          warning: '#D97706',
-          critical: '#F47C7C',
+          amber: '#9C3C27',
+          warning: '#B86B22',
+          critical: '#B94C3A',
         }
       },
       fontFamily: {

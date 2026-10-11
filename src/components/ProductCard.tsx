@@ -6,6 +6,7 @@ import { isProductPurchasable } from '../utils/eligibility';
 import RescueClock from './RescueClock';
 import { calculateRescueRecommendation } from '../utils/rescueEngine';
 import { useAuth } from '../context/useAuth';
+import ProductImage, { CROISSANT_FALLBACK } from './ProductImage';
 
 interface ProductCardProps {
   product: Product;
@@ -24,7 +25,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
     <article className="card group flex flex-col h-full bg-surface-white">
       <div className="relative aspect-[4/3] overflow-hidden">
         <Link to={`/product/${product.id}`} aria-label={`View ${product.name}`}>
-          <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+          <ProductImage src={product.imageUrl} alt={product.name} fallbackSrc={product.name.toLowerCase().includes('croissant') ? CROISSANT_FALLBACK : undefined} className="absolute inset-0 w-full h-full transition-transform duration-700 group-hover:scale-105" />
         </Link>
         <div className="absolute top-4 left-4 flex flex-col gap-2 pointer-events-none">
           <span className="badge bg-text-primary text-surface-white">{product.discountPercentage}% OFF</span>

@@ -37,7 +37,7 @@ export const mockProducts: Product[] = [
     storageInfo: 'Store in a cool, dry place.',
     minimumAcceptablePrice: 100,
     availableQuantity: 2,
-    imageUrl: 'https://images.unsplash.com/photo-1555507036-ab1f40ce88cb?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://karu.com.py/storage/productos/854601706287435.jpg',
     category: 'Bakery',
     distance: '3.5 km',
     isEligibleForSale: true
@@ -141,7 +141,7 @@ export const mockProducts: Product[] = [
     pickupDeadline: addDays(new Date(), 12).toISOString(),
     minimumAcceptablePrice: 230,
     availableQuantity: 9,
-    imageUrl: 'https://images.unsplash.com/photo-1599599810694-b5ac54d6b6b2?auto=format&fit=crop&q=80&w=800',
+    imageUrl: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&q=80&w=800',
     category: 'Snacks',
     distance: '5.1 km',
     isEligibleForSale: true

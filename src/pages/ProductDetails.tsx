@@ -7,6 +7,7 @@ import { isProductPurchasable } from '../utils/eligibility';
 import RescueClock from '../components/RescueClock';
 import { calculateRescueRecommendation } from '../utils/rescueEngine';
 import { useAuth } from '../context/useAuth';
+import ProductImage, { CROISSANT_FALLBACK } from '../components/ProductImage';
 
 const ProductDetails = () => {
   const { id, productId } = useParams<{ id?: string; productId?: string }>();
@@ -41,11 +42,7 @@ const ProductDetails = () => {
             
             {/* Left Image */}
             <div className="relative aspect-square md:aspect-auto">
-              <img 
-                src={product.imageUrl} 
-                alt={product.name}
-                className="w-full h-full object-cover"
-              />
+              <ProductImage src={product.imageUrl} alt={product.name} fallbackSrc={product.name.toLowerCase().includes('croissant') ? CROISSANT_FALLBACK : undefined} className="w-full h-full" />
               <div className="absolute top-4 left-4 flex flex-col gap-2">
                 <span className="badge bg-brand-forest text-surface-white px-3 py-1.5 text-sm shadow-md">
                   {product.discountPercentage}% OFF
