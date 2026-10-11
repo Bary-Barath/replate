@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { Search, Filter, SlidersHorizontal, X } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { useAppContext } from '../context/useAppContext';
-import { isProductPurchasable } from '../utils/eligibility';
+import { filterMarketplaceProducts, type MarketplaceSort } from '../utils/marketplaceEngine';
 
 const categories = ['All', 'Bakery', 'Fruits & Vegetables', 'Dairy', 'Meals', 'Beverages', 'Snacks'];
 
@@ -16,24 +16,7 @@ const Marketplace = () => {
   // Filters
   const [minDiscount, setMinDiscount] = useState<number>(0);
   
-  const filteredProducts = useMemo(() => {
-    const matchingProducts = products.filter(product => {
-      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            product.sellerName.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
-      const matchesDiscount = product.discountPercentage >= minDiscount;
-      const matchesEligibility = isProductPurchasable(product);
-      
-      return matchesSearch && matchesCategory && matchesDiscount && matchesEligibility;
-    });
-
-    return [...matchingProducts].sort((a, b) => {
-      if (sortBy === 'discount') return b.discountPercentage - a.discountPercentage;
-      if (sortBy === 'price') return a.rescuePrice - b.rescuePrice;
-      if (sortBy === 'distance') return Number.parseFloat(a.distance ?? '999') - Number.parseFloat(b.distance ?? '999');
-      return new Date(a.bestBefore).getTime() - new Date(b.bestBefore).getTime();
-    });
-  }, [products, searchQuery, selectedCategory, minDiscount, sortBy]);
+  const filteredProducts = useMemo(() => filterMarketplaceProducts(products, { searchQuery, category: selectedCategory, minDiscount, sortBy: sortBy as MarketplaceSort }), [products, searchQuery, selectedCategory, minDiscount, sortBy]);
 
   return (
     <div className="bg-surface-ivory min-h-screen">

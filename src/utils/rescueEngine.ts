@@ -9,6 +9,7 @@ export interface RescueRecommendation {
   remainingHours: number | null;
 }
 
+/** Produces a seller-facing urgency score without lowering the seller's minimum price. */
 export const calculateRescueRecommendation = (product: Product): RescueRecommendation => {
   const deadline = product.pickupDeadline ? parseISO(product.pickupDeadline) : null;
   const remainingHours = deadline && isValid(deadline) ? Math.max(0, differenceInHours(deadline, new Date())) : null;

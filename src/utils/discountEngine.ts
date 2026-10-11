@@ -9,6 +9,10 @@ export interface DiscountRecommendation {
   reason: string;
 }
 
+/**
+ * Calculates a date-based rescue discount. Invalid or expired food is returned
+ * as ineligible; the UI must not treat the discount recommendation as a safety decision.
+ */
 export const calculateDiscount = (
   originalPrice: number,
   bestBeforeStr: string,

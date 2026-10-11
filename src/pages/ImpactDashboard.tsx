@@ -3,6 +3,7 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxi
 import { ArrowRight, Leaf, PackageCheck, PiggyBank, Recycle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAppContext } from '../context/useAppContext';
+import { calculatePersonalImpact } from '../utils/impactEngine';
 
 const history = [
   { month: 'May', kg: 1820, savings: 68000 },
@@ -15,14 +16,7 @@ const history = [
 
 const ImpactDashboard = () => {
   const { orders } = useAppContext();
-  const personalImpact = useMemo(() => orders.reduce((impact, order) => {
-    const quantity = order.items.reduce((total, item) => total + item.quantity, 0);
-    return {
-      orders: impact.orders + 1,
-      kg: impact.kg + quantity * 0.35,
-      savings: impact.savings + order.items.reduce((total, item) => total + (item.product.originalPrice - item.product.rescuePrice) * item.quantity, 0),
-    };
-  }, { orders: 0, kg: 0, savings: 0 }), [orders]);
+  const personalImpact = useMemo(() => calculatePersonalImpact(orders), [orders]);
 
   const metrics = [
     { label: 'Food rescued', value: '12,400 kg', detail: 'across the RePlate network', icon: Recycle, color: 'text-brand-fresh' },
