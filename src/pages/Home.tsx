@@ -1,11 +1,14 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Leaf, ShieldCheck, Tag, TrendingDown, Clock } from 'lucide-react';
+import { formatDistanceToNow, parseISO } from 'date-fns';
 import ProductCard from '../components/ProductCard';
 import { useAppContext } from '../context/useAppContext';
+import { isProductPurchasable } from '../utils/eligibility';
 
 const Home = () => {
   const { products } = useAppContext();
-  const topDeals = products.slice(0, 4);
+  const topDeals = products.filter(isProductPurchasable).sort((a, b) => a.rescuePrice - b.rescuePrice).slice(0, 4);
+  const heroDeal = topDeals[0] ?? products[0];
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
@@ -18,7 +21,7 @@ const Home = () => {
                 Food Rescue Marketplace
               </span>
               <h1 className="text-5xl md:text-7xl font-display font-extrabold text-text-primary leading-[1.1] mb-6 tracking-tight">
-                Good food shouldn't become waste.
+                Good food deserves a second chance.
               </h1>
               <p className="text-xl text-text-secondary mb-10 leading-relaxed">
                 Discover quality food from local businesses at up to 75% off before it reaches its applicable sale deadline.
@@ -50,17 +53,17 @@ const Home = () => {
                   className="w-24 h-24 rounded-lg object-cover"
                 />
                 <div className="flex-grow">
-                  <h4 className="font-bold text-lg text-text-primary leading-tight">Chocolate Croissant</h4>
-                  <p className="text-sm text-text-secondary mb-2">La Petite Boulangerie</p>
+                  <h4 className="font-bold text-lg text-text-primary leading-tight">{heroDeal?.name ?? 'Rescue deal'}</h4>
+                  <p className="text-sm text-text-secondary mb-2">{heroDeal?.sellerName ?? 'Local partner'}</p>
                   <div className="flex items-baseline gap-2 mt-1">
-                    <span className="text-2xl font-extrabold text-brand-forest">₹39</span>
-                    <span className="text-sm text-text-secondary line-through font-medium">₹120</span>
+                    <span className="text-2xl font-extrabold text-brand-forest">₹{heroDeal?.rescuePrice.toFixed(0) ?? '—'}</span>
+                    <span className="text-sm text-text-secondary line-through font-medium">₹{heroDeal?.originalPrice.toFixed(0) ?? '—'}</span>
                   </div>
                 </div>
                 <div className="text-right flex flex-col items-end justify-between h-20">
-                  <span className="badge bg-text-primary text-surface-white">68% OFF</span>
+                  <span className="badge bg-text-primary text-surface-white">{heroDeal?.discountPercentage ?? 0}% OFF</span>
                   <span className="text-xs font-bold text-accent-amber uppercase tracking-widest flex items-center gap-1">
-                    <Clock size={12} strokeWidth={3} /> 4 Days
+                    <Clock size={12} strokeWidth={3} /> {heroDeal ? formatDistanceToNow(parseISO(heroDeal.bestBefore)) : 'today'}
                   </span>
                 </div>
               </div>

@@ -9,24 +9,27 @@ export default {
       colors: {
         brand: {
           forest: '#174D3A',
-          deep: '#103B2D',
-          fresh: '#2F7D57',
+          deep: '#061713',
+          fresh: '#62D6A5',
+          lime: '#B9F77A',
+          teal: '#2FBF9F',
         },
         surface: {
-          ivory: '#FAF8F2',
-          white: '#FFFFFF',
+          ivory: '#061713',
+          white: '#102C23',
+          glass: 'rgba(255,255,255,0.07)',
         },
         text: {
-          primary: '#202722',
-          secondary: '#70776F',
+          primary: '#F4FFF8',
+          secondary: '#A9BEB4',
         },
         border: {
-          DEFAULT: '#E7E9E3',
+          DEFAULT: 'rgba(255,255,255,0.16)',
         },
         accent: {
           amber: '#F0B44D',
           warning: '#D97706',
-          critical: '#C83D3D',
+          critical: '#F47C7C',
         }
       },
       fontFamily: {

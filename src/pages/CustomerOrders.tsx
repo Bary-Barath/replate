@@ -1,0 +1,6 @@
+import { Link } from 'react-router-dom';
+import { useAppContext } from '../context/useAppContext';
+
+const CustomerOrders = () => { const { orders } = useAppContext(); return <div className="bg-surface-white border border-border/70 rounded-2xl p-6"><h2 className="text-2xl font-display font-extrabold mb-2">My orders</h2><p className="text-text-secondary mb-7">Track every meal you have rescued.</p>{orders.length > 0 ? <div className="space-y-4">{orders.map((order) => <article key={order.id} className="border border-border rounded-xl p-5 flex flex-col sm:flex-row sm:items-center gap-4"><div className="flex-1"><p className="font-bold">{order.id}</p><p className="text-sm text-text-secondary">{new Date(order.createdAt).toLocaleDateString()} · {order.items.map((item) => `${item.quantity}× ${item.product.name}`).join(', ')}</p></div><span className="badge bg-brand-forest/10 text-brand-forest">{order.status}</span><span className="font-bold">₹{order.total.toFixed(2)}</span></article>)}</div> : <div className="text-center bg-surface-ivory rounded-xl p-10"><p className="text-text-secondary mb-5">No orders yet.</p><Link to="/explore" className="btn-primary">Explore deals</Link></div>}</div>; };
+
+export default CustomerOrders;

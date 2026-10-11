@@ -1,8 +1,11 @@
 import { Clock, Heart, MapPin, ShoppingCart } from 'lucide-react';
-import { formatDistanceToNow, parseISO } from 'date-fns';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { Product } from '../types';
 import { useAppContext } from '../context/useAppContext';
+import { isProductPurchasable } from '../utils/eligibility';
+import RescueClock from './RescueClock';
+import { calculateRescueRecommendation } from '../utils/rescueEngine';
+import { useAuth } from '../context/useAuth';
 
 interface ProductCardProps {
   product: Product;
@@ -10,9 +13,12 @@ interface ProductCardProps {
 
 const ProductCard = ({ product }: ProductCardProps) => {
   const { addToCart, isFavorite, toggleFavorite } = useAppContext();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const savings = product.originalPrice - product.rescuePrice;
-  const timeRemaining = formatDistanceToNow(parseISO(product.bestBefore), { addSuffix: true });
   const favorite = isFavorite(product.id);
+  const purchasable = isProductPurchasable(product);
+  const recommendation = calculateRescueRecommendation(product);
 
   return (
     <article className="card group flex flex-col h-full bg-surface-white">
@@ -24,7 +30,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           <span className="badge bg-text-primary text-surface-white">{product.discountPercentage}% OFF</span>
           <span className="badge bg-surface-white/95 text-text-primary flex items-center gap-1.5 shadow-sm">
             <Clock size={10} className="text-accent-amber" strokeWidth={3} />
-            Ends {timeRemaining}
+            <RescueClock deadline={product.pickupDeadline ?? product.bestBefore} />
           </span>
         </div>
         <button
@@ -32,7 +38,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           aria-label={favorite ? `Remove ${product.name} from favorites` : `Add ${product.name} to favorites`}
           aria-pressed={favorite}
           className={`absolute top-4 right-4 p-2.5 bg-surface-white/90 rounded-full transition-all shadow-sm ${favorite ? 'text-accent-critical opacity-100' : 'text-text-secondary opacity-0 group-hover:opacity-100'}`}
-          onClick={() => toggleFavorite(product.id)}
+          onClick={() => user ? toggleFavorite(product.id) : navigate(`/auth/sign-in?redirect=/product/${product.id}`)}
         >
           <Heart size={18} fill={favorite ? 'currentColor' : 'none'} strokeWidth={2.5} />
         </button>
@@ -52,17 +58,17 @@ const ProductCard = ({ product }: ProductCardProps) => {
             <span className="text-2xl font-bold text-text-primary tracking-tight">₹{product.rescuePrice.toFixed(2)}</span>
             <span className="text-sm text-text-secondary line-through font-medium">₹{product.originalPrice.toFixed(2)}</span>
           </div>
-          <p className="text-xs font-semibold text-brand-fresh mb-5 tracking-wide uppercase">You save ₹{savings.toFixed(2)}</p>
+          <div className="flex items-center justify-between gap-2 mb-5"><p className="text-xs font-semibold text-brand-fresh tracking-wide uppercase">You save ₹{savings.toFixed(2)}</p>{recommendation.label !== 'Insufficient data' && <span className={`text-[10px] uppercase tracking-wider font-bold ${recommendation.label === 'High' ? 'text-accent-amber' : 'text-text-secondary'}`}>{recommendation.label} priority</span>}</div>
           <div className="flex items-center justify-between gap-4">
             <div className="text-xs text-text-primary font-bold bg-surface-ivory px-4 py-2 rounded-full shadow-inner">{product.availableQuantity} left</div>
             <button
               type="button"
-              disabled={product.availableQuantity <= 0}
+              disabled={!purchasable}
               className="btn-primary py-2.5 px-6 flex-1 text-sm flex items-center justify-center gap-2"
-              onClick={() => addToCart(product)}
+              onClick={() => user ? addToCart(product) : navigate(`/auth/sign-in?redirect=/product/${product.id}`)}
             >
               <ShoppingCart size={16} strokeWidth={2.5} />
-              {product.availableQuantity > 0 ? 'Add' : 'Sold out'}
+              {purchasable ? 'Add' : 'Unavailable'}
             </button>
           </div>
         </div>

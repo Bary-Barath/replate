@@ -3,9 +3,10 @@ import type { ReactNode } from 'react';
 import type { CartItem, CustomerInfo, Order, Product } from '../types';
 import { mockProducts } from '../mockData';
 import { calculateCartTotal, clampCartQuantity } from '../utils/cartEngine';
+import { isProductPurchasable } from '../utils/eligibility';
 import { AppContext } from './context';
 
-const STORAGE_KEY = 'replate-demo-state';
+const STORAGE_KEY = 'replate-demo-state-v2';
 
 interface PersistedState {
   products: Product[];
@@ -48,6 +49,21 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setState((current) => ({ ...current, products: [...current.products, product] }));
   };
 
+  const updateProduct = (productId: string, updates: Partial<Product>, sellerId: string) => {
+    const product = state.products.find((item) => item.id === productId);
+    const ownsProduct = product && (product.sellerId === sellerId || (sellerId === 'demo-seller' && product.sellerName === 'FreshBake Bakery'));
+    if (!ownsProduct) return false;
+    setState((current) => ({
+      ...current,
+      products: current.products.map((product) => {
+        const ownsProduct = product.sellerId === sellerId || (sellerId === 'demo-seller' && product.sellerName === 'FreshBake Bakery');
+        if (product.id !== productId || !ownsProduct) return product;
+        return { ...product, ...updates };
+      }),
+    }));
+    return true;
+  };
+
   const setCartQuantity = (productId: string, quantity: number) => {
     setState((current) => ({
       ...current,
@@ -62,7 +78,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const addToCart = (product: Product, quantity = 1) => {
-    if (quantity <= 0 || product.availableQuantity <= 0) return;
+    if (quantity <= 0 || !isProductPurchasable(product)) return;
     setState((current) => {
       const existing = current.cart.find((item) => item.product.id === product.id);
       const nextQuantity = Math.min(
@@ -118,10 +134,15 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const platformFee = Number((cartTotal * 0.05).toFixed(2));
 
   const placeOrder = (customer: CustomerInfo): Order | null => {
-    if (state.cart.length === 0) return null;
+    const validCart = state.cart.filter((item) => isProductPurchasable(item.product));
+    if (validCart.length !== state.cart.length) {
+      setState((current) => ({ ...current, cart: validCart }));
+      return null;
+    }
+    if (validCart.length === 0) return null;
     const order: Order = {
       id: `RP-${Date.now().toString(36).toUpperCase()}`,
-      items: state.cart,
+      items: validCart,
       customer,
       subtotal: cartTotal,
       platformFee,
@@ -147,6 +168,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     <AppContext.Provider value={{
       ...state,
       addProduct,
+      updateProduct,
       addToCart,
       increaseQuantity,
       decreaseQuantity,

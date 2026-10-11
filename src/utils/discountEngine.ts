@@ -1,4 +1,4 @@
-import { differenceInDays, parseISO, startOfDay } from 'date-fns';
+import { differenceInDays, isValid, parseISO, startOfDay } from 'date-fns';
 
 export interface DiscountRecommendation {
   originalPrice: number;
@@ -19,6 +19,17 @@ export const calculateDiscount = (
   // Use 'useBy' if available for strict deadline, else use 'bestBefore'
   const deadlineStr = useByStr || bestBeforeStr;
   const deadlineDate = startOfDay(parseISO(deadlineStr));
+
+  if (originalPrice <= 0 || !isValid(deadlineDate)) {
+    return {
+      originalPrice,
+      recommendedDiscountPercentage: 0,
+      recommendedRescuePrice: 0,
+      remainingDays: 0,
+      isEligible: false,
+      reason: 'Enter a valid positive price and a valid applicable sale deadline.',
+    };
+  }
   
   const remainingDays = differenceInDays(deadlineDate, today);
   

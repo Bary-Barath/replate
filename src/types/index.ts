@@ -11,6 +11,16 @@ export interface Product {
   category: string;
   distance?: string;
   isEligibleForSale: boolean;
+  sellerId?: string;
+  isPaused?: boolean;
+  pathway?: 'human' | 'feed';
+  pickupDeadline?: string;
+  pickupInstructions?: string;
+  collectionLocation?: string;
+  allergenInfo?: string;
+  storageInfo?: string;
+  minimumAcceptablePrice?: number;
+  availableWeightKg?: number;
 }
 
 export interface Category {
@@ -32,6 +42,21 @@ export interface CustomerInfo {
 }
 
 export type OrderStatus = 'confirmed' | 'ready' | 'collected';
+
+export type UserRole = 'customer' | 'seller' | 'admin';
+export type SellerVerificationStatus = 'pending' | 'verified' | 'rejected';
+
+export interface AuthUser {
+  id: string;
+  role: UserRole;
+  name: string;
+  email: string;
+  phone?: string;
+  businessName?: string;
+  businessCategory?: string;
+  businessAddress?: string;
+  verificationStatus?: SellerVerificationStatus;
+}
 
 export interface Order {
   id: string;

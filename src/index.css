@@ -5,28 +5,41 @@
 
 @layer base {
   body {
-    @apply font-sans bg-surface-ivory text-text-primary antialiased;
+    @apply font-sans bg-brand-deep text-text-primary antialiased;
+    background-image: radial-gradient(circle at 8% 0%, rgba(98, 214, 165, 0.12), transparent 32rem), radial-gradient(circle at 95% 12%, rgba(185, 247, 122, 0.08), transparent 28rem);
+    min-width: 320px;
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-display text-text-primary font-bold tracking-tight;
   }
+
+  ::selection { @apply bg-brand-lime text-brand-deep; }
+  :focus-visible { @apply outline-2 outline-offset-2 outline-brand-lime; }
 }
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center bg-brand-forest text-surface-white font-medium px-8 py-3.5 rounded-full transition-all duration-300 hover:bg-brand-fresh hover:shadow-[0_0_20px_rgba(47,125,87,0.5)] active:scale-95 disabled:opacity-50 disabled:pointer-events-none tracking-wide text-sm;
+    @apply inline-flex items-center justify-center bg-brand-lime text-brand-deep font-bold px-8 py-3.5 rounded-full transition-all duration-300 hover:bg-surface-white hover:text-brand-lime hover:shadow-[0_0_28px_rgba(185,247,122,0.28)] active:scale-95 disabled:opacity-50 disabled:pointer-events-none tracking-wide text-sm;
   }
   
   .btn-secondary {
-    @apply inline-flex items-center justify-center bg-surface-white/70 backdrop-blur-md text-text-primary border border-border font-medium px-8 py-3.5 rounded-full transition-all duration-300 hover:border-brand-forest hover:text-brand-forest active:scale-95 disabled:opacity-50 disabled:pointer-events-none tracking-wide text-sm;
+    @apply inline-flex items-center justify-center bg-surface-glass backdrop-blur-md text-text-primary border border-border font-semibold px-8 py-3.5 rounded-full transition-all duration-300 hover:bg-surface-white hover:border-brand-fresh hover:text-brand-fresh active:scale-95 disabled:opacity-50 disabled:pointer-events-none tracking-wide text-sm;
   }
 
   .card {
-    @apply bg-surface-white rounded-3xl border border-border/40 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-brand-forest/30;
+    @apply bg-surface-glass backdrop-blur-xl rounded-3xl border border-border/70 shadow-[0_18px_60px_rgba(0,0,0,0.18)] overflow-hidden transition-all duration-300 hover:shadow-[0_22px_70px_rgba(0,0,0,0.28)] hover:-translate-y-1 hover:border-brand-fresh/40;
   }
   
   .badge {
     @apply inline-flex items-center px-3 py-1.5 rounded-full text-[10px] uppercase font-bold tracking-widest backdrop-blur-md;
+  }
+
+  .glass-panel {
+    @apply bg-surface-glass backdrop-blur-xl border border-border/70 shadow-[0_18px_60px_rgba(0,0,0,0.18)];
+  }
+
+  .eyebrow {
+    @apply text-brand-lime uppercase tracking-[0.22em] text-[10px] font-extrabold;
   }
 }

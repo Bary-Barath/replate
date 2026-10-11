@@ -7,6 +7,7 @@ export interface AppContextType {
   favorites: string[];
   orders: Order[];
   addProduct: (product: Product) => void;
+  updateProduct: (productId: string, updates: Partial<Product>, sellerId: string) => boolean;
   addToCart: (product: Product, quantity?: number) => void;
   increaseQuantity: (productId: string) => void;
   decreaseQuantity: (productId: string) => void;

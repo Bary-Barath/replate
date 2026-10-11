@@ -1,0 +1,10 @@
+import { Wheat, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../context/useAuth';
+
+const FeedRescue = () => {
+  const { user } = useAuth();
+  return <main className="min-h-screen py-10 md:py-16"><div className="max-w-5xl mx-auto px-6 lg:px-12"><div className="card p-8 md:p-12 overflow-hidden relative"><div className="absolute -right-20 -top-20 w-64 h-64 rounded-full bg-brand-lime/10 blur-3xl" /><p className="eyebrow mb-4">Seller-only workflow</p><div className="max-w-3xl"><div className="w-14 h-14 rounded-2xl bg-brand-lime/15 text-brand-lime flex items-center justify-center mb-6"><Wheat /></div><h1 className="text-4xl md:text-6xl font-display font-extrabold tracking-tight">Feed Rescue, kept separate by design.</h1><p className="text-text-secondary text-lg mt-5 leading-relaxed">Inventory that is no longer eligible for human consumption can be routed to verified animal-feed or compost partners. It never appears in the customer marketplace.</p><div className="grid md:grid-cols-3 gap-4 mt-10"><div className="rounded-2xl bg-surface-white/5 border border-border p-4"><p className="font-bold">1. Classify</p><p className="text-sm text-text-secondary mt-2">Record why a listing moved out of the human-food pathway.</p></div><div className="rounded-2xl bg-surface-white/5 border border-border p-4"><p className="font-bold">2. Verify</p><p className="text-sm text-text-secondary mt-2">Use an approved partner and document the handoff.</p></div><div className="rounded-2xl bg-surface-white/5 border border-border p-4"><p className="font-bold">3. Track</p><p className="text-sm text-text-secondary mt-2">Keep feed outcomes separate from customer orders and impact.</p></div></div><div className="mt-10 flex flex-wrap gap-3"><span className="badge bg-brand-lime/15 text-brand-lime"><ShieldCheck size={14} /> {user?.businessName ?? 'Verified seller'} workspace</span><Link to="/seller/products" className="btn-primary inline-flex items-center gap-2">Review listings <ArrowRight size={16} /></Link></div></div></div></div></main>;
+};
+
+export default FeedRescue;

@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { Search, Filter, SlidersHorizontal, X } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { useAppContext } from '../context/useAppContext';
+import { isProductPurchasable } from '../utils/eligibility';
 
 const categories = ['All', 'Bakery', 'Fruits & Vegetables', 'Dairy', 'Meals', 'Beverages', 'Snacks'];
 
@@ -21,7 +22,7 @@ const Marketplace = () => {
                             product.sellerName.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
       const matchesDiscount = product.discountPercentage >= minDiscount;
-      const matchesEligibility = product.isEligibleForSale;
+      const matchesEligibility = isProductPurchasable(product);
       
       return matchesSearch && matchesCategory && matchesDiscount && matchesEligibility;
     });
