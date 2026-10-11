@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { Search, Filter, SlidersHorizontal, X } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/useAppContext';
 
 const categories = ['All', 'Bakery', 'Fruits & Vegetables', 'Dairy', 'Meals', 'Beverages', 'Snacks'];
 
@@ -10,12 +10,13 @@ const Marketplace = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [sortBy, setSortBy] = useState('ending-soon');
 
   // Filters
   const [minDiscount, setMinDiscount] = useState<number>(0);
   
   const filteredProducts = useMemo(() => {
-    return products.filter(product => {
+    const matchingProducts = products.filter(product => {
       const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                             product.sellerName.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
@@ -24,7 +25,14 @@ const Marketplace = () => {
       
       return matchesSearch && matchesCategory && matchesDiscount && matchesEligibility;
     });
-  }, [searchQuery, selectedCategory, minDiscount]);
+
+    return [...matchingProducts].sort((a, b) => {
+      if (sortBy === 'discount') return b.discountPercentage - a.discountPercentage;
+      if (sortBy === 'price') return a.rescuePrice - b.rescuePrice;
+      if (sortBy === 'distance') return Number.parseFloat(a.distance ?? '999') - Number.parseFloat(b.distance ?? '999');
+      return new Date(a.bestBefore).getTime() - new Date(b.bestBefore).getTime();
+    });
+  }, [products, searchQuery, selectedCategory, minDiscount, sortBy]);
 
   return (
     <div className="bg-surface-ivory min-h-screen">
@@ -147,12 +155,12 @@ const Marketplace = () => {
               
               <div className="hidden sm:flex items-center gap-2">
                 <span className="text-sm text-text-secondary">Sort by:</span>
-                <select className="bg-surface-white border border-border rounded-lg px-3 py-1.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-forest/50">
-                  <option>Ending Soon</option>
-                  <option>Biggest Discount</option>
-                  <option>Lowest Price</option>
-                  <option>Nearest</option>
-                </select>
+                  <select value={sortBy} onChange={(event) => setSortBy(event.target.value)} className="bg-surface-white border border-border rounded-lg px-3 py-1.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-forest/50">
+                   <option value="ending-soon">Ending Soon</option>
+                   <option value="discount">Biggest Discount</option>
+                   <option value="price">Lowest Price</option>
+                   <option value="distance">Nearest</option>
+                 </select>
               </div>
             </div>
 

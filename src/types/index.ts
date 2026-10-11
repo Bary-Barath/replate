@@ -18,3 +18,28 @@ export interface Category {
   name: string;
   imageUrl: string;
 }
+
+export interface CartItem {
+  product: Product;
+  quantity: number;
+}
+
+export interface CustomerInfo {
+  name: string;
+  email: string;
+  phone: string;
+  pickupPreference: 'standard' | 'contactless';
+}
+
+export type OrderStatus = 'confirmed' | 'ready' | 'collected';
+
+export interface Order {
+  id: string;
+  items: CartItem[];
+  customer: CustomerInfo;
+  subtotal: number;
+  platformFee: number;
+  total: number;
+  createdAt: string;
+  status: OrderStatus;
+}

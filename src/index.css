@@ -15,18 +15,18 @@
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center bg-text-primary text-surface-white font-medium px-6 py-3.5 rounded-lg transition-all duration-300 hover:bg-brand-forest hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50 disabled:pointer-events-none tracking-wide text-sm;
+    @apply inline-flex items-center justify-center bg-brand-forest text-surface-white font-medium px-8 py-3.5 rounded-full transition-all duration-300 hover:bg-brand-fresh hover:shadow-[0_0_20px_rgba(47,125,87,0.5)] active:scale-95 disabled:opacity-50 disabled:pointer-events-none tracking-wide text-sm;
   }
   
   .btn-secondary {
-    @apply inline-flex items-center justify-center bg-transparent text-text-primary border border-border font-medium px-6 py-3.5 rounded-lg transition-all duration-300 hover:border-brand-forest hover:text-brand-forest active:bg-surface-ivory disabled:opacity-50 disabled:pointer-events-none tracking-wide text-sm;
+    @apply inline-flex items-center justify-center bg-surface-white/70 backdrop-blur-md text-text-primary border border-border font-medium px-8 py-3.5 rounded-full transition-all duration-300 hover:border-brand-forest hover:text-brand-forest active:scale-95 disabled:opacity-50 disabled:pointer-events-none tracking-wide text-sm;
   }
 
   .card {
-    @apply bg-surface-white rounded-lg border border-border/60 overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-brand-forest/5 hover:border-border;
+    @apply bg-surface-white rounded-3xl border border-border/40 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-brand-forest/30;
   }
   
   .badge {
-    @apply inline-flex items-center px-2.5 py-1 rounded-sm text-[10px] uppercase font-bold tracking-widest;
+    @apply inline-flex items-center px-3 py-1.5 rounded-full text-[10px] uppercase font-bold tracking-widest backdrop-blur-md;
   }
 }

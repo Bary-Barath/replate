@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import { Package, TrendingUp, DollarSign, Clock, AlertCircle } from 'lucide-react';
 import { calculateDiscount } from '../utils/discountEngine';
-import { useAppContext } from '../context/AppContext';
-import { useNavigate } from 'react-router-dom';
+import { useAppContext } from '../context/useAppContext';
 
 const SellerDashboard = () => {
-  const { addProduct } = useAppContext();
-  const navigate = useNavigate();
+  const { products, orders } = useAppContext();
   const [activeTab, setActiveTab] = useState('overview');
+  const sellerProducts = products.filter((product) => product.sellerName === 'FreshBake Bakery');
 
   return (
     <div className="bg-surface-ivory min-h-screen flex flex-col md:flex-row">
@@ -70,16 +69,31 @@ const SellerDashboard = () => {
           </div>
         )}
 
-        {activeTab === 'add-product' && <AddProductForm />}
+        {activeTab === 'products' && (
+          <div className="bg-surface-white rounded-3xl border border-border p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-6"><div><h2 className="text-2xl font-bold">Your listings</h2><p className="text-text-secondary">Manage the products currently associated with your business.</p></div><button type="button" className="btn-primary" onClick={() => setActiveTab('add-product')}>Add product</button></div>
+            {sellerProducts.length > 0 ? <div className="space-y-3">{sellerProducts.map((product) => <div key={product.id} className="flex items-center gap-4 border border-border rounded-xl p-4"><img src={product.imageUrl} alt="" className="w-16 h-16 rounded-lg object-cover" /><div className="flex-1"><h3 className="font-bold">{product.name}</h3><p className="text-sm text-text-secondary">{product.category} · {product.availableQuantity} available</p></div><span className="font-bold text-brand-forest">₹{product.rescuePrice.toFixed(2)}</span></div>)}</div> : <p className="text-text-secondary">No listings yet.</p>}
+          </div>
+        )}
+
+        {activeTab === 'orders' && (
+          <div className="bg-surface-white rounded-3xl border border-border p-6 shadow-sm"><h2 className="text-2xl font-bold mb-2">Customer orders</h2><p className="text-text-secondary mb-6">Orders placed during this demo session appear here.</p>{orders.length > 0 ? <div className="space-y-3">{orders.map((order) => <div key={order.id} className="border border-border rounded-xl p-4 flex flex-col sm:flex-row sm:items-center gap-3"><div className="flex-1"><h3 className="font-bold">{order.id}</h3><p className="text-sm text-text-secondary">{order.customer.name} · {order.items.length} product type(s)</p></div><span className="badge bg-brand-forest/10 text-brand-forest">{order.status}</span><span className="font-bold">₹{order.total.toFixed(2)}</span></div>)}</div> : <p className="text-text-secondary">No customer orders yet.</p>}</div>
+        )}
+
+        {activeTab === 'add-product' && (
+          <AddProductForm onPublished={() => setActiveTab('overview')} />
+        )}
       </main>
     </div>
   );
 };
 
-const AddProductForm = () => {
+const AddProductForm = ({ onPublished }: { onPublished: () => void }) => {
+  const { addProduct } = useAppContext();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     name: '',
+    category: 'Bakery',
     originalPrice: '',
     bestBefore: '',
     quantity: '1',
@@ -114,6 +128,18 @@ const AddProductForm = () => {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
+                <label className="block text-sm font-medium text-text-secondary mb-2">Category</label>
+                <select
+                  className="w-full border border-border rounded-xl p-3 bg-surface-ivory focus:outline-none focus:ring-2 focus:ring-brand-forest/50"
+                  value={formData.category}
+                  onChange={e => setFormData({...formData, category: e.target.value})}
+                >
+                  {['Bakery', 'Fruits & Vegetables', 'Dairy', 'Meals', 'Beverages', 'Snacks'].map(category => (
+                    <option key={category} value={category}>{category}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
                 <label className="block text-sm font-medium text-text-secondary mb-2">Original Price (₹)</label>
                 <input 
                   type="number" 
@@ -132,7 +158,13 @@ const AddProductForm = () => {
                 />
               </div>
             </div>
-            <button className="btn-primary w-full mt-6" onClick={() => setStep(2)}>Next Step</button>
+            <button
+              className="btn-primary w-full mt-6"
+              disabled={!formData.name.trim() || Number(formData.originalPrice) <= 0 || Number(formData.quantity) <= 0}
+              onClick={() => setStep(2)}
+            >
+              Next Step
+            </button>
           </div>
         )}
 
@@ -175,7 +207,13 @@ const AddProductForm = () => {
             
             <div className="flex gap-4 mt-6">
               <button className="btn-secondary flex-1" onClick={() => setStep(1)}>Back</button>
-              <button className="btn-primary flex-1" onClick={() => setStep(3)}>Next Step</button>
+              <button
+                className="btn-primary flex-1"
+                disabled={!recommendation?.isEligible}
+                onClick={() => setStep(3)}
+              >
+                Next Step
+              </button>
             </div>
           </div>
         )}
@@ -227,9 +265,9 @@ const AddProductForm = () => {
                     isEligibleForSale: true
                   };
                   addProduct(newProduct);
-                  setActiveTab('overview');
+                  onPublished();
                   setStep(1);
-                  setFormData({ name: '', category: 'Bakery', originalPrice: '', quantity: '', bestBefore: '' });
+                  setFormData({ name: '', category: 'Bakery', originalPrice: '', quantity: '1', bestBefore: '' });
                 }}
               >Publish Listing</button>
             </div>

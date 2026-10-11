@@ -1,17 +1,17 @@
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Heart, MapPin, Clock, Info, ShieldCheck } from 'lucide-react';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/useAppContext';
 import { format, parseISO, formatDistanceToNow } from 'date-fns';
 
 const ProductDetails = () => {
   const { id } = useParams<{ id: string }>();
-  const { products, addToCart } = useAppContext();
+  const { products, addToCart, isFavorite, toggleFavorite } = useAppContext();
   const navigate = useNavigate();
-  const product = products.find(p => p.id === id) || products[0]; // fallback for demo
+  const product = products.find(p => p.id === id);
   const [quantity, setQuantity] = useState(1);
   
-  if (!product) return <div>Product not found</div>;
+  if (!product) return <div className="min-h-[70vh] flex flex-col items-center justify-center text-center"><h1 className="text-3xl font-display font-extrabold mb-3">Product not found</h1><p className="text-text-secondary mb-6">This rescue listing may have expired or been removed.</p><button type="button" onClick={() => navigate('/explore')} className="btn-primary">Browse active deals</button></div>;
   
   const savings = product.originalPrice - product.rescuePrice;
   const bestBeforeDate = parseISO(product.bestBefore);
@@ -55,8 +55,8 @@ const ProductDetails = () => {
             <div className="p-8 lg:p-12 flex flex-col h-full">
               <div className="flex justify-between items-start mb-2">
                 <h1 className="text-3xl font-display font-bold text-text-primary">{product.name}</h1>
-                <button className="p-3 text-text-secondary hover:text-brand-forest hover:bg-brand-forest/5 rounded-full transition-colors">
-                  <Heart size={24} />
+                <button type="button" aria-label={isFavorite(product.id) ? 'Remove from favorites' : 'Add to favorites'} aria-pressed={isFavorite(product.id)} onClick={() => toggleFavorite(product.id)} className="p-3 text-text-secondary hover:text-brand-forest hover:bg-brand-forest/5 rounded-full transition-colors">
+                  <Heart size={24} fill={isFavorite(product.id) ? 'currentColor' : 'none'} />
                 </button>
               </div>
               

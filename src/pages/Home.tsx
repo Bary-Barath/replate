@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Leaf, ShieldCheck, Tag, TrendingDown, Clock } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
-import { useAppContext } from '../context/AppContext';
+import { useAppContext } from '../context/useAppContext';
 
 const Home = () => {
   const { products } = useAppContext();

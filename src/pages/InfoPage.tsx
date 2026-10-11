@@ -1,0 +1,21 @@
+import { Link, useParams } from 'react-router-dom';
+
+const content: Record<string, { title: string; intro: string; sections: Array<[string, string]> }> = {
+  about: { title: 'About RePlate', intro: 'RePlate gives good food another chance while helping local businesses recover value from surplus stock.', sections: [['Our mission', 'We connect customers with eligible surplus food at accessible prices before its applicable sale deadline.'], ['Our promise', 'Every listing clearly shows its price, availability, seller, and date information so customers can make informed choices.']] },
+  'how-it-works': { title: 'How It Works', intro: 'Rescuing food takes just three simple steps.', sections: [['1. Businesses list surplus', 'Food businesses publish eligible products with quantities, prices, and dates.'], ['2. Customers choose a deal', 'Customers browse local rescue listings and add the products they want to their cart.'], ['3. Orders are confirmed', 'Customers complete checkout and collect their order according to the seller instructions.']] },
+  impact: { title: 'Our Impact', intro: 'Small purchases can create meaningful change.', sections: [['Less waste', 'Rescuing surplus food reduces avoidable waste and the resources used to produce it.'], ['More value', 'Businesses recover revenue from stock that might otherwise go unsold.']] },
+  safety: { title: 'Food Safety', intro: 'Food safety comes first on RePlate.', sections: [['Seller responsibility', 'Businesses are responsible for listing accurate dates, ingredients, storage guidance, and eligibility information.'], ['Customer responsibility', 'Customers should follow collection, storage, and consumption instructions supplied by the seller.']] },
+  privacy: { title: 'Privacy Policy', intro: 'This demo stores data locally in your browser and does not send it to a server.', sections: [['Demo data', 'Cart items, favorites, listings, and demo orders are stored in localStorage for persistence between refreshes.'], ['Payments', 'No real payment is processed and payment fields are not retained after checkout.']] },
+  terms: { title: 'Terms of Service', intro: 'RePlate is currently a demonstration marketplace.', sections: [['Demo limitations', 'Listings, metrics, orders, and payments are simulated and should not be treated as live commerce data.'], ['Responsible use', 'Do not enter real payment card details into this demonstration application.']] },
+  help: { title: 'Help Centre', intro: 'Find quick answers about the RePlate demo.', sections: [['Cart help', 'Use the plus and minus controls to adjust quantities. Quantities cannot exceed listed availability.'], ['Seller help', 'Use the Seller Hub to create a listing and preview the calculated rescue price.']] },
+  contact: { title: 'Contact RePlate', intro: 'For this demo, contact support is represented by this information page.', sections: [['Customer support', 'Email support@replate.demo with the page and issue you are experiencing.'], ['Business support', 'Businesses can use the Seller Hub to manage demo listings.']] },
+  'feed-rescue': { title: 'Feed Rescue', intro: 'Surplus food can support the wider community when it cannot be sold through the marketplace.', sections: [['Community partners', 'In a production version, eligible partners could coordinate donations and redistribution from participating businesses.'], ['Demo status', 'This demonstration focuses on marketplace purchases; donation logistics are represented for future expansion.']] },
+};
+
+const InfoPage = () => {
+  const { slug = 'about' } = useParams();
+  const page = content[slug] ?? content.about;
+  return <div className="max-w-4xl mx-auto px-6 py-16 min-h-[70vh]"><p className="text-brand-forest font-bold uppercase tracking-widest text-xs mb-4">RePlate information</p><h1 className="text-5xl font-display font-extrabold mb-6">{page.title}</h1><p className="text-xl text-text-secondary leading-relaxed mb-12">{page.intro}</p><div className="space-y-8">{page.sections.map(([heading, body]) => <section key={heading} className="bg-surface-white rounded-2xl border border-border p-6"><h2 className="text-xl font-bold mb-2">{heading}</h2><p className="text-text-secondary leading-relaxed">{body}</p></section>)}</div><Link to="/" className="btn-secondary mt-10">Back to home</Link></div>;
+};
+
+export default InfoPage;

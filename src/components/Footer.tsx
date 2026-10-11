@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
 
+const currentYear = new Date().getFullYear();
+
 const Footer = () => {
   return (
     <footer className="bg-brand-deep text-surface-ivory pt-16 pb-8">
@@ -43,7 +45,7 @@ const Footer = () => {
         
         <div className="border-t border-surface-ivory/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-surface-ivory/60">
-            © {new Date().getFullYear()} RePlate. All rights reserved.
+            © {currentYear} RePlate. All rights reserved.
           </p>
           <div className="flex gap-4">
             {/* Social icons would go here */}
