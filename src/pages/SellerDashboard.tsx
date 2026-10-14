@@ -1,325 +1,285 @@
-import { useState } from 'react';
 import { Package, TrendingUp, DollarSign, Clock, AlertCircle } from 'lucide-react';
-import { calculateDiscount } from '../utils/discountEngine';
-import { calculateRescueRecommendation } from '../utils/rescueEngine';
 import { useAppContext } from '../context/useAppContext';
 import { useAuth } from '../context/useAuth';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { isProductPurchasable } from '../utils/eligibility';
+import { ProductManagement } from '../components/ProductManagement';
+import ProductImage from '../components/ProductImage';
 
 const SellerDashboard = () => {
-  const { products, orders, updateProduct } = useAppContext();
+  const { products, orders } = useAppContext();
   const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const routeTab = location.pathname.includes('/products/new') ? 'add-product' : location.pathname.includes('/products') ? 'products' : location.pathname.includes('/orders') ? 'orders' : location.pathname.includes('/rescue-deals') ? 'rescue-deals' : location.pathname.includes('/feed-rescue') ? 'feed-rescue' : location.pathname.includes('/analytics') ? 'analytics' : location.pathname.includes('/settings') ? 'settings' : 'overview';
+
+  const routeTab = location.pathname.includes('/products/new')
+    ? 'add-product'
+    : location.pathname.includes('/products')
+    ? 'products'
+    : location.pathname.includes('/orders')
+    ? 'orders'
+    : location.pathname.includes('/rescue-deals')
+    ? 'rescue-deals'
+    : location.pathname.includes('/feed-rescue')
+    ? 'feed-rescue'
+    : location.pathname.includes('/analytics')
+    ? 'analytics'
+    : location.pathname.includes('/settings')
+    ? 'settings'
+    : 'overview';
+
   const activeTab = routeTab;
   const sellerName = user?.businessName ?? 'FreshBake Bakery';
-  const sellerProducts = products.filter((product) => product.sellerName === sellerName);
+  const sellerProducts = products.filter(
+    (product) =>
+      product.sellerName === sellerName ||
+      (product.sellerId && user?.id && product.sellerId === user.id) ||
+      (!product.sellerId && product.sellerName === 'FreshBake Bakery')
+  );
   const sellerProductIds = new Set(sellerProducts.map((product) => product.id));
-  const sellerOrders = orders.filter((order) => order.items.some((item) => sellerProductIds.has(item.product.id)));
-  const sellerRevenue = sellerOrders.reduce((total, order) => total + order.items.filter((item) => sellerProductIds.has(item.product.id)).reduce((sum, item) => sum + item.product.rescuePrice * item.quantity, 0), 0);
-  const sellerUnits = sellerOrders.reduce((total, order) => total + order.items.filter((item) => sellerProductIds.has(item.product.id)).reduce((sum, item) => sum + item.quantity, 0), 0);
-  const sellerKg = sellerProducts.reduce((total, product) => total + (product.availableWeightKg ?? 0), 0);
+  const sellerOrders = orders.filter((order) =>
+    order.items.some((item) => sellerProductIds.has(item.product.id))
+  );
+
+  const sellerRevenue = sellerOrders.reduce(
+    (total, order) =>
+      total +
+      order.items
+        .filter((item) => sellerProductIds.has(item.product.id))
+        .reduce((sum, item) => sum + item.product.rescuePrice * item.quantity, 0),
+    0
+  );
+
+  const sellerUnits = sellerOrders.reduce(
+    (total, order) =>
+      total +
+      order.items
+        .filter((item) => sellerProductIds.has(item.product.id))
+        .reduce((sum, item) => sum + item.quantity, 0),
+    0
+  );
+
+  const sellerKg = sellerProducts.reduce(
+    (total, product) => total + (product.availableWeightKg ?? 0.5 * product.availableQuantity),
+    0
+  );
   const activeListings = sellerProducts.filter(isProductPurchasable).length;
+
   const sellerStats = [
-    { label: 'Revenue Recovered', value: `₹${sellerRevenue.toFixed(0)}`, icon: DollarSign, color: 'text-brand-fresh' },
+    { label: 'Revenue Recovered', value: `₹${sellerRevenue.toFixed(0)}`, icon: DollarSign, color: 'text-brand-forest' },
     { label: 'Products Rescued', value: String(sellerUnits), icon: Package, color: 'text-accent-warning' },
     { label: 'Food Listed (kg)', value: sellerKg ? sellerKg.toFixed(1) : '—', icon: TrendingUp, color: 'text-brand-forest' },
-    { label: 'Active Listings', value: String(activeListings), icon: Clock, color: 'text-accent-amber' },
+    { label: 'Active Listings', value: String(activeListings), icon: Clock, color: 'text-brand-forest' },
   ];
 
   return (
-    <div className="bg-surface-ivory min-h-screen flex flex-col md:flex-row">
+    <div className="min-h-screen flex flex-col md:flex-row">
       {/* Sidebar */}
-      <aside className="w-full md:w-64 bg-surface-white border-r border-border shrink-0">
-        <div className="p-6 border-b border-border">
-          <h2 className="text-xl font-display font-bold text-brand-forest">Seller Hub</h2>
-          <p className="text-sm text-text-secondary">{sellerName}</p>
+      <aside className="w-full md:w-64 glass-panel border-r border-glass-border shrink-0 p-6">
+        <div className="pb-6 border-b border-glass-border mb-6">
+          <span className="eyebrow">Seller Hub</span>
+          <h2 className="text-xl font-display font-extrabold text-brand-forest truncate">{sellerName}</h2>
+          <p className="text-xs text-text-secondary mt-1">Verified Partner</p>
         </div>
-        <nav className="p-4 space-y-2">
-          {['overview', 'products', 'add-product', 'rescue-deals', 'orders', 'feed-rescue', 'analytics', 'settings'].map(tab => (
-            <button 
-              key={tab}
-              onClick={() => navigate(tab === 'overview' ? '/seller/dashboard' : tab === 'add-product' ? '/seller/products/new' : `/seller/${tab}`)}
-              className={`w-full text-left px-4 py-2 rounded-lg font-medium capitalize transition-colors ${
-                activeTab === tab ? 'bg-brand-forest/10 text-brand-forest' : 'text-text-secondary hover:bg-surface-ivory hover:text-text-primary'
+
+        <nav className="space-y-1.5">
+          {[
+            { id: 'overview', label: 'Overview', path: '/seller/dashboard' },
+            { id: 'products', label: 'My Listings', path: '/seller/products' },
+            { id: 'add-product', label: 'Add Deal', path: '/seller/products/new' },
+            { id: 'orders', label: 'Orders', path: '/seller/orders' },
+            { id: 'rescue-deals', label: 'Rescue Radar', path: '/seller/rescue-deals' },
+            { id: 'feed-rescue', label: 'Feed Rescue', path: '/seller/feed-rescue' },
+            { id: 'analytics', label: 'Analytics', path: '/seller/analytics' },
+            { id: 'settings', label: 'Settings', path: '/seller/settings' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => navigate(tab.path)}
+              className={`w-full text-left px-4 py-2.5 rounded-xl font-semibold text-xs capitalize transition-all cursor-pointer ${
+                activeTab === tab.id
+                  ? 'bg-brand-forest text-surface-white shadow-sm'
+                  : 'text-text-secondary hover:bg-surface-white/70 hover:text-text-primary'
               }`}
             >
-              {tab.replace('-', ' ')}
+              {tab.label}
             </button>
           ))}
         </nav>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-6 md:p-8 overflow-y-auto">
-        <h1 className="text-3xl font-display font-bold text-text-primary mb-2">Turn surplus into recovered revenue.</h1>
-        <p className="text-text-secondary mb-8">Manage your rescue deals and track your impact.</p>
+      <main className="flex-1 p-6 md:p-10 overflow-y-auto">
+        <div className="mb-8">
+          <h1 className="text-3xl md:text-4xl font-display font-extrabold text-text-primary">
+            Turn surplus into recovered revenue.
+          </h1>
+          <p className="text-text-secondary mt-1">
+            Manage your rescue deals, upload product imagery, and track customer collections.
+          </p>
+        </div>
 
         {activeTab === 'overview' && (
-          <div className="space-y-6">
+          <div className="space-y-8 animate-fadeIn">
             {/* Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {sellerStats.map(stat => (
-                /*
-                { label: 'Revenue Recovered', value: '₹12,450', icon: DollarSign, color: 'text-brand-fresh' },
-                { label: 'Products Rescued', value: '185', icon: Package, color: 'text-accent-warning' },
-                { label: 'Food Rescued (kg)', value: '42.5', icon: TrendingUp, color: 'text-brand-forest' },
-                { label: 'Active Listings', value: '8', icon: Clock, color: 'text-accent-amber' },
-                */<div key={stat.label} className="bg-surface-white p-6 rounded-2xl border border-border shadow-sm flex items-start gap-4">
-                  <div className={`p-3 rounded-xl bg-surface-ivory ${stat.color}`}>
-                    <stat.icon size={24} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {sellerStats.map((stat) => (
+                <div key={stat.label} className="glass-panel-solid rounded-3xl p-6 border border-glass-border">
+                  <div className={`p-3 rounded-2xl bg-brand-mint/60 w-fit mb-3 ${stat.color}`}>
+                    <stat.icon size={22} />
                   </div>
-                  <div>
-                    <p className="text-sm text-text-secondary font-medium mb-1">{stat.label}</p>
-                    <p className="text-2xl font-bold text-text-primary">{stat.value}</p>
-                  </div>
+                  <p className="text-xs uppercase tracking-wider text-text-secondary font-semibold mb-1">
+                    {stat.label}
+                  </p>
+                  <p className="text-3xl font-display font-extrabold text-text-primary">{stat.value}</p>
                 </div>
               ))}
             </div>
 
-            {/* Alerts */}
-            <div className="bg-accent-warning/10 border border-accent-warning/20 rounded-2xl p-6 flex gap-4">
-              <AlertCircle className="text-accent-warning shrink-0 mt-1" />
+            {/* Expiring Listings Alert */}
+            <div className="bg-brand-mint/50 border border-brand-forest/20 rounded-3xl p-6 flex items-start gap-4 shadow-sm">
+              <AlertCircle className="text-brand-forest shrink-0 mt-0.5" size={22} />
               <div>
-                <h4 className="font-semibold text-text-primary mb-1">Items approaching sale deadline</h4>
-                <p className="text-sm text-text-secondary">You have 3 items whose applicable sale deadline is within 48 hours. Consider accepting the recommended final rescue discount.</p>
+                <h4 className="font-bold text-text-primary text-sm mb-1">Smart Rescue Urgency</h4>
+                <p className="text-xs text-text-secondary leading-relaxed">
+                  You have active listings approaching their scheduled pickup deadline. RePlate's smart pricing
+                  recommends final discounts to accelerate rescues and avoid food waste.
+                </p>
+              </div>
+            </div>
+
+            {/* Quick Listings View */}
+            <div className="glass-panel-solid rounded-3xl p-6 border border-glass-border">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h3 className="font-bold font-display text-xl text-text-primary">Active Rescue Deals</h3>
+                  <p className="text-xs text-text-secondary">Your current surplus listings live in the marketplace</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => navigate('/seller/products')}
+                  className="btn-secondary text-xs"
+                >
+                  Manage All
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {sellerProducts.slice(0, 4).map((product) => (
+                  <div key={product.id} className="card p-4 flex items-center gap-4 bg-surface-white/80">
+                    <ProductImage
+                      src={product.imageUrl}
+                      alt={product.name}
+                      productName={product.name}
+                      className="w-16 h-16 rounded-2xl shrink-0 border border-glass-border"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <h4 className="font-bold text-sm text-text-primary truncate">{product.name}</h4>
+                      <p className="text-xs text-text-secondary">{product.category} • {product.availableQuantity} left</p>
+                      <div className="flex items-baseline gap-2 mt-1">
+                        <span className="font-extrabold text-brand-forest text-sm">
+                          ₹{product.rescuePrice.toFixed(2)}
+                        </span>
+                        <span className="text-xs text-text-secondary line-through">
+                          ₹{product.originalPrice.toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         )}
 
-        {activeTab === 'products' && (
-          <div className="bg-surface-white rounded-3xl border border-border p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-6"><div><h2 className="text-2xl font-bold">Your listings</h2><p className="text-text-secondary">Manage the products currently associated with your business.</p></div><button type="button" className="btn-primary" onClick={() => navigate('/seller/products/new')}>Add product</button></div>
-            {sellerProducts.length > 0 ? <div className="space-y-3">{sellerProducts.map((product) => <div key={product.id} className="flex flex-col sm:flex-row sm:items-center gap-4 border border-border rounded-xl p-4"><img src={product.imageUrl} alt="" className="w-16 h-16 rounded-lg object-cover" /><div className="flex-1"><h3 className="font-bold">{product.name}</h3><p className="text-sm text-text-secondary">{product.category} · {product.availableQuantity} available</p></div><span className={`badge ${product.isPaused || product.availableQuantity === 0 ? 'bg-accent-warning/15 text-accent-warning' : 'bg-brand-forest/10 text-brand-forest'}`}>{product.isPaused ? 'Paused' : product.availableQuantity === 0 ? 'Sold out' : 'Live'}</span><span className="font-bold text-brand-forest">₹{product.rescuePrice.toFixed(2)}</span><div className="flex gap-2"><button type="button" onClick={() => updateProduct(product.id, { isPaused: !product.isPaused }, user?.id ?? '')} className="btn-secondary px-3 py-2 text-xs">{product.isPaused ? 'Resume' : 'Pause'}</button><button type="button" onClick={() => updateProduct(product.id, { availableQuantity: 0 }, user?.id ?? '')} disabled={product.availableQuantity === 0} className="btn-secondary px-3 py-2 text-xs disabled:opacity-50">Sold out</button></div></div>)}</div> : <p className="text-text-secondary">No listings yet.</p>}
+        {(activeTab === 'products' || activeTab === 'add-product') && (
+          <div className="animate-fadeIn">
+            <ProductManagement sellerOnly={true} />
           </div>
         )}
 
         {activeTab === 'orders' && (
-          <div className="bg-surface-white rounded-3xl border border-border p-6 shadow-sm"><h2 className="text-2xl font-bold mb-2">Customer orders</h2><p className="text-text-secondary mb-6">Orders containing your products appear here.</p>{sellerOrders.length > 0 ? <div className="space-y-3">{sellerOrders.map((order) => <div key={order.id} className="border border-border rounded-xl p-4 flex flex-col sm:flex-row sm:items-center gap-3"><div className="flex-1"><h3 className="font-bold">{order.id}</h3><p className="text-sm text-text-secondary">{order.customer.name} · {order.items.filter((item) => sellerProductIds.has(item.product.id)).map((item) => `${item.quantity}× ${item.product.name}`).join(', ')}</p></div><span className="badge bg-brand-forest/10 text-brand-forest">{order.status}</span><span className="font-bold">₹{order.total.toFixed(2)}</span></div>)}</div> : <p className="text-text-secondary">No customer orders yet.</p>}</div>
-        )}
+          <div className="glass-panel-solid rounded-3xl p-6 border border-glass-border animate-fadeIn">
+            <h2 className="text-2xl font-bold font-display text-text-primary mb-2">Customer Rescue Orders</h2>
+            <p className="text-sm text-text-secondary mb-6">Orders containing your products appear here.</p>
 
-        {activeTab === 'add-product' && (
-          <AddProductForm onPublished={() => navigate('/seller/dashboard')} />
+            {sellerOrders.length > 0 ? (
+              <div className="space-y-4">
+                {sellerOrders.map((order) => {
+                  const relevantItems = order.items.filter((item) => sellerProductIds.has(item.product.id));
+                  return (
+                    <div key={order.id} className="card p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 rounded-2xl bg-brand-mint/60 flex items-center justify-center text-brand-forest shrink-0 font-bold text-sm">
+                          {relevantItems.length}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-bold text-text-primary">{order.id}</h3>
+                            <span className="badge badge-mint">{order.status}</span>
+                          </div>
+                          <p className="text-xs text-text-secondary">
+                            Customer: {order.customer.name} ({order.customer.phone})
+                          </p>
+                          <div className="flex flex-wrap gap-2 mt-2">
+                            {relevantItems.map((item) => (
+                              <div key={item.product.id} className="flex items-center gap-2 bg-surface-secondary/60 rounded-xl px-2.5 py-1 text-xs">
+                                <ProductImage
+                                  src={item.product.imageUrl}
+                                  alt={item.product.name}
+                                  productName={item.product.name}
+                                  className="w-5 h-5 rounded-md"
+                                />
+                                <span className="font-medium text-text-primary">
+                                  {item.quantity}× {item.product.name}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xl font-extrabold text-brand-forest">
+                          ₹{relevantItems.reduce((s, it) => s + it.product.rescuePrice * it.quantity, 0).toFixed(2)}
+                        </span>
+                        <p className="text-[11px] text-text-secondary">{new Date(order.createdAt).toLocaleDateString()}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-text-secondary text-sm">No customer orders placed yet.</p>
+            )}
+          </div>
         )}
 
         {['rescue-deals', 'feed-rescue', 'analytics', 'settings'].includes(activeTab) && (
-          <div className="bg-surface-white rounded-3xl border border-border p-8 shadow-sm"><p className="text-xs uppercase tracking-widest text-brand-forest font-bold mb-3">Seller workspace</p><h2 className="text-2xl font-display font-extrabold mb-3">{activeTab.replace('-', ' ')}</h2><p className="text-text-secondary max-w-xl mb-6">This seller workspace is ready for shared product and order data. Connect the backend provider to enable production fulfilment, analytics, and verification workflows.</p><div className="grid grid-cols-1 sm:grid-cols-3 gap-4"><div className="rounded-xl bg-surface-ivory p-4"><p className="text-xs text-text-secondary mb-2">Status</p><p className="font-bold text-brand-fresh">Demo ready</p></div><div className="rounded-xl bg-surface-ivory p-4"><p className="text-xs text-text-secondary mb-2">Listings</p><p className="font-bold">{sellerProducts.length}</p></div><div className="rounded-xl bg-surface-ivory p-4"><p className="text-xs text-text-secondary mb-2">Orders</p><p className="font-bold">{orders.length}</p></div></div></div>
+          <div className="glass-panel-solid rounded-3xl p-8 border border-glass-border animate-fadeIn">
+            <span className="eyebrow">Seller Operations</span>
+            <h2 className="text-2xl font-display font-extrabold text-text-primary mb-3 capitalize">
+              {activeTab.replace('-', ' ')}
+            </h2>
+            <p className="text-sm text-text-secondary max-w-xl mb-6">
+              Track business performance, manage collection schedules, and inspect revenue recovery trends.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="rounded-2xl bg-surface-secondary/60 p-4 border border-border-emeraldSubtle">
+                <p className="text-xs text-text-secondary mb-1">Active Products</p>
+                <p className="text-2xl font-bold font-display text-brand-forest">{sellerProducts.length}</p>
+              </div>
+              <div className="rounded-2xl bg-surface-secondary/60 p-4 border border-border-emeraldSubtle">
+                <p className="text-xs text-text-secondary mb-1">Fulfilled Orders</p>
+                <p className="text-2xl font-bold font-display text-brand-forest">{sellerOrders.length}</p>
+              </div>
+              <div className="rounded-2xl bg-surface-secondary/60 p-4 border border-border-emeraldSubtle">
+                <p className="text-xs text-text-secondary mb-1">Recovered Revenue</p>
+                <p className="text-2xl font-bold font-display text-brand-forest">₹{sellerRevenue.toFixed(0)}</p>
+              </div>
+            </div>
+          </div>
         )}
       </main>
-    </div>
-  );
-};
-
-const AddProductForm = ({ onPublished }: { onPublished: () => void }) => {
-  const { addProduct } = useAppContext();
-  const { user } = useAuth();
-  const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
-    name: '',
-    category: 'Bakery',
-    originalPrice: '',
-    bestBefore: '',
-    pickupDeadline: '',
-    minimumPrice: '',
-    quantity: '1',
-  });
-
-  const recommendation = formData.originalPrice && formData.bestBefore 
-    ? calculateDiscount(Number(formData.originalPrice), formData.bestBefore)
-    : null;
-  const rescueRecommendation = formData.originalPrice && formData.pickupDeadline && formData.minimumPrice
-    ? calculateRescueRecommendation({ id: 'draft', name: formData.name, sellerName: user?.businessName ?? 'Seller', originalPrice: Number(formData.originalPrice), rescuePrice: recommendation?.recommendedRescuePrice ?? Number(formData.originalPrice), discountPercentage: recommendation?.recommendedDiscountPercentage ?? 0, bestBefore: formData.bestBefore, pickupDeadline: new Date(formData.pickupDeadline).toISOString(), availableQuantity: Number(formData.quantity), imageUrl: '', category: formData.category, isEligibleForSale: true, minimumAcceptablePrice: Number(formData.minimumPrice), pathway: 'human' })
-    : null;
-
-  return (
-    <div className="bg-surface-white rounded-3xl border border-border overflow-hidden max-w-3xl shadow-sm">
-      <div className="border-b border-border flex">
-        {[1, 2, 3].map(s => (
-          <div key={s} className={`flex-1 p-4 text-center text-sm font-semibold border-b-2 transition-colors ${step === s ? 'border-brand-forest text-brand-forest' : 'border-transparent text-text-secondary'}`}>
-            Step {s}
-          </div>
-        ))}
-      </div>
-      
-      <div className="p-8">
-        {step === 1 && (
-          <div className="space-y-6">
-            <h3 className="text-xl font-bold text-text-primary">Product Information</h3>
-            <div>
-              <label className="block text-sm font-medium text-text-secondary mb-2">Product Name</label>
-              <input 
-                type="text" 
-                className="w-full border border-border rounded-xl p-3 bg-surface-ivory focus:outline-none focus:ring-2 focus:ring-brand-forest/50" 
-                value={formData.name}
-                onChange={e => setFormData({...formData, name: e.target.value})}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-text-secondary mb-2">Category</label>
-                <select
-                  className="w-full border border-border rounded-xl p-3 bg-surface-ivory focus:outline-none focus:ring-2 focus:ring-brand-forest/50"
-                  value={formData.category}
-                  onChange={e => setFormData({...formData, category: e.target.value})}
-                >
-                  {['Bakery', 'Fruits & Vegetables', 'Dairy', 'Meals', 'Beverages', 'Snacks'].map(category => (
-                    <option key={category} value={category}>{category}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-text-secondary mb-2">Minimum acceptable rescue price (₹)</label>
-                <input type="number" min="1" className="w-full border border-border rounded-xl p-3 bg-surface-ivory focus:outline-none focus:ring-2 focus:ring-brand-forest/50" value={formData.minimumPrice} onChange={e => setFormData({...formData, minimumPrice: e.target.value})} placeholder="100" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-text-secondary mb-2">Original Price (₹)</label>
-                <input 
-                  type="number" 
-                  className="w-full border border-border rounded-xl p-3 bg-surface-ivory focus:outline-none focus:ring-2 focus:ring-brand-forest/50" 
-                  value={formData.originalPrice}
-                  onChange={e => setFormData({...formData, originalPrice: e.target.value})}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-text-secondary mb-2">Quantity</label>
-                <input 
-                  type="number" 
-                  className="w-full border border-border rounded-xl p-3 bg-surface-ivory focus:outline-none focus:ring-2 focus:ring-brand-forest/50" 
-                  value={formData.quantity}
-                  onChange={e => setFormData({...formData, quantity: e.target.value})}
-                />
-              </div>
-            </div>
-            <button
-              className="btn-primary w-full mt-6"
-              disabled={!formData.name.trim() || Number(formData.originalPrice) <= 0 || Number(formData.quantity) <= 0}
-              onClick={() => setStep(2)}
-            >
-              Next Step
-            </button>
-          </div>
-        )}
-
-        {step === 2 && (
-          <div className="space-y-6">
-            <h3 className="text-xl font-bold text-text-primary">Dates & Eligibility</h3>
-            <div>
-              <label className="block text-sm font-medium text-text-secondary mb-2">Best Before Date</label>
-              <input 
-                type="date" 
-                className="w-full border border-border rounded-xl p-3 bg-surface-ivory focus:outline-none focus:ring-2 focus:ring-brand-forest/50" 
-                value={formData.bestBefore}
-                onChange={e => setFormData({...formData, bestBefore: e.target.value})}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-text-secondary mb-2">Pickup / rescue deadline</label>
-              <input type="datetime-local" className="w-full border border-border rounded-xl p-3 bg-surface-ivory focus:outline-none focus:ring-2 focus:ring-brand-forest/50" value={formData.pickupDeadline} onChange={e => setFormData({...formData, pickupDeadline: e.target.value})} />
-            </div>
-            
-            {formData.bestBefore && recommendation && (
-              <div className="bg-brand-forest/5 border border-brand-forest/20 rounded-2xl p-6 mt-6">
-                <h4 className="font-bold text-text-primary mb-4 flex items-center gap-2">
-                  <DollarSign size={20} className="text-brand-forest" />
-                  Smart Pricing Recommendation
-                </h4>
-                
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div className="bg-surface-white p-3 rounded-xl border border-border">
-                    <span className="block text-xs text-text-secondary mb-1">Recommended Discount</span>
-                    <span className="text-lg font-bold text-brand-forest">{recommendation.recommendedDiscountPercentage}% OFF</span>
-                  </div>
-                  <div className="bg-surface-white p-3 rounded-xl border border-border">
-                    <span className="block text-xs text-text-secondary mb-1">Rescue Price</span>
-                    <span className="text-lg font-bold text-text-primary">₹{recommendation.recommendedRescuePrice.toFixed(2)}</span>
-                  </div>
-                </div>
-                
-                <p className="text-sm text-text-secondary bg-surface-white p-3 rounded-xl border border-border italic">
-                  {recommendation.reason}
-                </p>
-              </div>
-            )}
-            {rescueRecommendation && <div className="bg-brand-lime/10 border border-brand-lime/20 rounded-2xl p-6"><p className="eyebrow mb-2">Smart Rescue Engine</p><p className="font-bold text-lg mb-2">{rescueRecommendation.label} rescue priority · {rescueRecommendation.score}/100</p><p className="text-sm text-text-secondary">{rescueRecommendation.explanation} Seller floor protected at ₹{formData.minimumPrice}.</p></div>}
-            
-            <div className="flex gap-4 mt-6">
-              <button className="btn-secondary flex-1" onClick={() => setStep(1)}>Back</button>
-              <button
-                className="btn-primary flex-1"
-                disabled={!recommendation?.isEligible || !rescueRecommendation || rescueRecommendation.score === null}
-                onClick={() => setStep(3)}
-              >
-                Next Step
-              </button>
-            </div>
-          </div>
-        )}
-
-        {step === 3 && (
-          <div className="space-y-6">
-            <h3 className="text-xl font-bold text-text-primary">Review & Publish</h3>
-            
-            <div className="bg-surface-ivory p-6 rounded-2xl border border-border space-y-4">
-              <div className="flex justify-between border-b border-border pb-4">
-                <span className="text-text-secondary">Product</span>
-                <span className="font-semibold text-text-primary">{formData.name || 'N/A'}</span>
-              </div>
-              <div className="flex justify-between border-b border-border pb-4">
-                <span className="text-text-secondary">Quantity</span>
-                <span className="font-semibold text-text-primary">{formData.quantity} items</span>
-              </div>
-              <div className="flex justify-between border-b border-border pb-4">
-                <span className="text-text-secondary">Original Price</span>
-                <span className="font-semibold text-text-primary line-through">₹{formData.originalPrice}</span>
-              </div>
-              <div className="flex justify-between border-b border-border pb-4">
-                <span className="text-text-secondary">Rescue Price</span>
-                <span className="font-bold text-brand-forest text-lg">₹{recommendation?.recommendedRescuePrice.toFixed(2) || '0.00'}</span>
-              </div>
-              <div className="flex justify-between pt-2">
-                <span className="text-text-secondary">Expected Revenue</span>
-                <span className="font-bold text-text-primary">₹{((recommendation?.recommendedRescuePrice || 0) * Number(formData.quantity)).toFixed(2)}</span>
-              </div>
-            </div>
-
-            <div className="flex gap-4 mt-6">
-              <button className="btn-secondary flex-1" onClick={() => setStep(2)}>Back</button>
-              <button 
-                className="btn-primary flex-1"
-                onClick={() => {
-                  const newProduct = {
-                    id: Math.random().toString(36).substr(2, 9),
-                    name: formData.name,
-                    sellerName: user?.businessName ?? 'FreshBake Bakery',
-                    originalPrice: Number(formData.originalPrice),
-                    rescuePrice: Math.max(Number(formData.minimumPrice), recommendation?.recommendedRescuePrice || 0),
-                    discountPercentage: recommendation?.recommendedDiscountPercentage || 0,
-                    bestBefore: formData.bestBefore ? new Date(formData.bestBefore).toISOString() : new Date().toISOString(),
-                    pickupDeadline: formData.pickupDeadline ? new Date(formData.pickupDeadline).toISOString() : new Date().toISOString(),
-                    availableQuantity: Number(formData.quantity),
-                    imageUrl: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&q=80&w=800',
-                    category: formData.category,
-                    distance: '0.5 km',
-                    isEligibleForSale: true,
-                    sellerId: user?.id
-                    , pathway: 'human' as const,
-                    minimumAcceptablePrice: Number(formData.minimumPrice),
-                    pickupInstructions: 'Follow the collection instructions shown after publishing.',
-                    collectionLocation: user?.businessAddress,
-                  };
-                  addProduct(newProduct);
-                  onPublished();
-                  setStep(1);
-                  setFormData({ name: '', category: 'Bakery', originalPrice: '', quantity: '1', bestBefore: '', pickupDeadline: '', minimumPrice: '' });
-                }}
-              >Publish Listing</button>
-            </div>
-          </div>
-        )}
-      </div>
     </div>
   );
 };

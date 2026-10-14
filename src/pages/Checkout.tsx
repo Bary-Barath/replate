@@ -1,34 +1,261 @@
 import { useState } from 'react';
-import { ArrowLeft, CheckCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle, ShieldCheck, MapPin, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { CustomerInfo, Order } from '../types';
 import { useAppContext } from '../context/useAppContext';
+import { useAuth } from '../context/useAuth';
+import ProductImage from '../components/ProductImage';
 
 const Checkout = () => {
-  const { cart, cartTotal, platformFee, placeOrder } = useAppContext();
+  const { cart, cartTotal, platformFee, placeOrderAsync } = useAppContext();
+  const { user } = useAuth();
   const navigate = useNavigate();
+
   const [order, setOrder] = useState<Order | null>(null);
-  const [error, setError] = useState('');
-  const [formData, setFormData] = useState<CustomerInfo>({ name: '', email: '', phone: '', pickupPreference: 'standard' });
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (cart.length === 0 && !order) return <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center"><h2 className="text-3xl font-display font-extrabold mb-3">Nothing to check out</h2><p className="text-text-secondary mb-8">Add a rescue deal to your cart first.</p><button type="button" onClick={() => navigate('/explore')} className="btn-primary">Explore Deals</button></div>;
+  const [formData, setFormData] = useState<CustomerInfo>({
+    name: user?.name || '',
+    email: user?.email || '',
+    phone: user?.phone || '',
+    pickupPreference: 'standard',
+  });
 
-  if (order) return <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center bg-surface-white"><CheckCircle size={80} className="text-brand-fresh mb-6" strokeWidth={1.5} /><h1 className="text-4xl font-display font-extrabold mb-4">Order Confirmed!</h1><p className="text-text-secondary text-lg mb-2 max-w-md">Thanks for rescuing food today, {order.customer.name}.</p><p className="font-semibold text-brand-forest mb-8">Order {order.id} · ₹{order.total.toFixed(2)}</p><button type="button" onClick={() => navigate('/explore')} className="btn-primary">Continue Rescuing</button></div>;
+  if (cart.length === 0 && !order) {
+    return (
+      <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center">
+        <h2 className="text-3xl font-display font-extrabold text-text-primary mb-3">Nothing to check out</h2>
+        <p className="text-text-secondary mb-8">Add a rescue deal to your cart first.</p>
+        <button type="button" onClick={() => navigate('/explore')} className="btn-primary">
+          Explore Deals
+        </button>
+      </div>
+    );
+  }
 
-  const updateField = (field: keyof CustomerInfo, value: string) => setFormData((current) => ({ ...current, [field]: value }));
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  if (order) {
+    return (
+      <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center">
+        <div className="glass-panel-solid rounded-3xl p-10 max-w-lg w-full border border-glass-border shadow-lg">
+          <div className="w-20 h-20 rounded-full bg-brand-mint/70 flex items-center justify-center mx-auto mb-6 text-brand-forest">
+            <CheckCircle size={44} />
+          </div>
+          <span className="eyebrow mb-2">Order Confirmed</span>
+          <h1 className="text-3xl font-display font-extrabold text-text-primary mb-3">Rescue Reserved!</h1>
+          <p className="text-text-secondary text-sm mb-6">
+            Thanks for rescuing food today, <span className="font-bold text-text-primary">{order.customer.name}</span>.
+            Your order is confirmed and reserved in the store inventory.
+          </p>
+
+          <div className="bg-surface-secondary/70 rounded-2xl p-5 mb-6 text-left border border-border-emeraldSubtle space-y-2 text-xs">
+            <div className="flex justify-between">
+              <span className="text-text-secondary">Order Reference:</span>
+              <span className="font-bold text-text-primary">{order.id}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-text-secondary">Total Paid:</span>
+              <span className="font-bold text-brand-forest">₹{order.total.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-text-secondary">Pickup Preference:</span>
+              <span className="font-semibold capitalize text-text-primary">{order.customer.pickupPreference} pickup</span>
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <button type="button" onClick={() => navigate('/customer/orders')} className="btn-secondary flex-1 text-xs">
+              View Order History
+            </button>
+            <button type="button" onClick={() => navigate('/explore')} className="btn-primary flex-1 text-xs">
+              Continue Rescuing
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const updateField = (field: keyof CustomerInfo, value: string) => {
+    setFormData((current) => ({ ...current, [field]: value }));
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setError(null);
+
     if (!formData.name.trim() || !formData.email.includes('@') || formData.phone.trim().length < 7) {
-      setError('Please enter a name, valid email address, and phone number.');
+      setError('Please provide a complete name, valid email address, and phone number.');
       return;
     }
-    const createdOrder = placeOrder(formData);
-    if (!createdOrder) setError('Your cart is empty.');
-    else setOrder(createdOrder);
+
+    setIsSubmitting(true);
+    try {
+      const res = await placeOrderAsync(formData);
+      if (res.error || !res.order) {
+        setError(res.error || 'Failed to complete order.');
+      } else {
+        setOrder(res.order);
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Checkout encountered an error';
+      setError(msg);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
   const finalTotal = cartTotal + platformFee;
 
-  return <div className="max-w-[1440px] mx-auto px-6 lg:px-12 py-12"><button type="button" onClick={() => navigate('/cart')} className="flex items-center gap-2 text-text-secondary hover:text-text-primary mb-8"><ArrowLeft size={20} /> Back to Cart</button><div className="flex flex-col lg:flex-row gap-16"><div className="flex-grow"><h1 className="text-3xl font-display font-extrabold mb-8">Checkout</h1><form onSubmit={handleSubmit} className="space-y-8"><div className="space-y-4"><h2 className="font-bold text-xl">Pickup information</h2><div className="grid grid-cols-1 md:grid-cols-2 gap-4"><label className="block text-sm font-medium text-text-secondary">Full Name<input required type="text" value={formData.name} onChange={(event) => updateField('name', event.target.value)} className="mt-1 w-full px-4 py-3 rounded-lg border border-border/80" placeholder="Jane Doe" /></label><label className="block text-sm font-medium text-text-secondary">Email Address<input required type="email" value={formData.email} onChange={(event) => updateField('email', event.target.value)} className="mt-1 w-full px-4 py-3 rounded-lg border border-border/80" placeholder="jane@example.com" /></label></div><label className="block text-sm font-medium text-text-secondary">Phone Number<input required type="tel" value={formData.phone} onChange={(event) => updateField('phone', event.target.value)} className="mt-1 w-full px-4 py-3 rounded-lg border border-border/80" placeholder="9876543210" /></label><label className="block text-sm font-medium text-text-secondary">Collection preference<select value={formData.pickupPreference} onChange={(event) => updateField('pickupPreference', event.target.value)} className="mt-1 w-full px-4 py-3 rounded-lg border border-border/80"><option value="standard">Standard collection</option><option value="contactless">Contactless collection</option></select></label></div>{error && <p role="alert" className="text-accent-critical bg-accent-critical/10 rounded-lg p-3">{error}</p>}<button type="submit" className="btn-primary w-full py-4 text-lg">Confirm demo order · ₹{finalTotal.toFixed(2)}</button><p className="text-xs text-text-secondary">This is a demo checkout. No real payment is processed.</p></form></div><aside className="lg:w-[400px]"><div className="bg-surface-ivory rounded-xl border border-border/80 p-8 sticky top-32"><h2 className="text-xl font-bold mb-6">Order Summary</h2><div className="space-y-4 mb-6">{cart.map((item) => <div key={item.product.id} className="flex justify-between gap-4"><span className="text-text-secondary">{item.quantity}× {item.product.name}</span><span>₹{(item.product.rescuePrice * item.quantity).toFixed(2)}</span></div>)}</div><div className="border-t border-border/50 pt-4 flex justify-between text-lg font-bold"><span>Total</span><span className="text-brand-forest">₹{finalTotal.toFixed(2)}</span></div></div></aside></div></div>;
+  return (
+    <div className="max-w-[1440px] mx-auto px-6 lg:px-12 py-12">
+      <button
+        type="button"
+        onClick={() => navigate('/customer/cart')}
+        className="flex items-center gap-2 text-text-secondary hover:text-text-primary mb-8 text-sm font-semibold transition-colors"
+      >
+        <ArrowLeft size={18} /> Back to Cart
+      </button>
+
+      <div className="flex flex-col lg:flex-row gap-12">
+        {/* Checkout Form */}
+        <div className="flex-grow">
+          <div className="mb-8">
+            <span className="eyebrow">Store Collection Details</span>
+            <h1 className="text-3xl md:text-4xl font-display font-extrabold text-text-primary tracking-tight">
+              Order Confirmation
+            </h1>
+          </div>
+
+          {error && (
+            <div className="mb-6 p-4 rounded-2xl bg-accent-coral/70 border border-accent-amber/30 text-accent-amber text-xs font-semibold flex items-center gap-2">
+              <AlertTriangle size={18} className="shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="glass-panel-solid rounded-3xl p-6 sm:p-8 border border-glass-border space-y-4">
+              <h2 className="font-bold font-display text-lg text-text-primary mb-4 flex items-center gap-2">
+                <MapPin size={18} className="text-brand-forest" /> Pickup Information
+              </h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-text-secondary mb-1">Full Name *</label>
+                  <input
+                    required
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => updateField('name', e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-glass-border bg-surface-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-forest/20"
+                    placeholder="Jane Doe"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-text-secondary mb-1">Email Address *</label>
+                  <input
+                    required
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => updateField('email', e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-glass-border bg-surface-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-forest/20"
+                    placeholder="jane@example.com"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-text-secondary mb-1">Phone Number *</label>
+                  <input
+                    required
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => updateField('phone', e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-glass-border bg-surface-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-forest/20"
+                    placeholder="+91 98765 43210"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-text-secondary mb-1">Collection Preference</label>
+                  <select
+                    value={formData.pickupPreference}
+                    onChange={(e) => updateField('pickupPreference', e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-glass-border bg-surface-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-forest/20"
+                  >
+                    <option value="standard">Standard counter collection</option>
+                    <option value="contactless">Contactless grab-and-go</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="btn-primary w-full py-4 text-base font-bold shadow-md cursor-pointer"
+            >
+              {isSubmitting ? 'Confirming and Validating Stock...' : `Reserve & Confirm · ₹${finalTotal.toFixed(2)}`}
+            </button>
+
+            <div className="p-4 rounded-2xl bg-surface-secondary/60 border border-border-emeraldSubtle text-xs text-text-secondary flex items-start gap-3">
+              <ShieldCheck size={18} className="text-brand-forest shrink-0 mt-0.5" />
+              <div>
+                <p className="font-semibold text-text-primary mb-0.5">Verified In-Store Pickup</p>
+                <p>
+                  No advance payment is collected online. Pay upon store collection or confirm your reservation directly with the merchant.
+                </p>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        {/* Aside Summary */}
+        <aside className="lg:w-[420px] shrink-0">
+          <div className="glass-panel-solid rounded-3xl border border-glass-border p-7 sticky top-28 shadow-sm">
+            <h2 className="text-lg font-bold font-display text-text-primary mb-4">Items in Your Rescue</h2>
+
+            <div className="space-y-3 mb-6 max-h-72 overflow-y-auto pr-1">
+              {cart.map((item) => (
+                <div key={item.product.id} className="flex items-center gap-3 py-2 border-b border-border/40">
+                  <ProductImage
+                    src={item.product.imageUrl}
+                    alt={item.product.name}
+                    productName={item.product.name}
+                    className="w-12 h-12 rounded-xl shrink-0 border border-glass-border"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold text-xs text-text-primary truncate">{item.product.name}</p>
+                    <p className="text-[11px] text-text-secondary">{item.quantity} × ₹{item.product.rescuePrice.toFixed(2)}</p>
+                  </div>
+                  <span className="font-extrabold text-xs text-brand-forest">
+                    ₹{(item.product.rescuePrice * item.quantity).toFixed(2)}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-2 mb-6 text-xs text-text-secondary border-b border-border/60 pb-4">
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+                <span className="font-bold text-text-primary">₹{cartTotal.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Platform Contribution</span>
+                <span className="font-semibold text-text-primary">₹{platformFee.toFixed(2)}</span>
+              </div>
+            </div>
+
+            <div className="flex justify-between items-baseline mb-2">
+              <span className="font-bold text-sm text-text-primary">Total Due at Pickup</span>
+              <span className="text-2xl font-extrabold text-brand-forest">₹{finalTotal.toFixed(2)}</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  );
 };
 
 export default Checkout;

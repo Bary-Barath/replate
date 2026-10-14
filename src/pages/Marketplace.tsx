@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Search, Filter, SlidersHorizontal, X } from 'lucide-react';
+import { Search, Filter, SlidersHorizontal, X, RefreshCw } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { useAppContext } from '../context/useAppContext';
 import { filterMarketplaceProducts, type MarketplaceSort } from '../utils/marketplaceEngine';
@@ -7,171 +7,209 @@ import { filterMarketplaceProducts, type MarketplaceSort } from '../utils/market
 const categories = ['All', 'Bakery', 'Fruits & Vegetables', 'Dairy', 'Meals', 'Beverages', 'Snacks'];
 
 const Marketplace = () => {
-  const { products } = useAppContext();
+  const { products, isLoadingProducts } = useAppContext();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [sortBy, setSortBy] = useState('ending-soon');
-
-  // Filters
   const [minDiscount, setMinDiscount] = useState<number>(0);
-  
-  const filteredProducts = useMemo(() => filterMarketplaceProducts(products, { searchQuery, category: selectedCategory, minDiscount, sortBy: sortBy as MarketplaceSort }), [products, searchQuery, selectedCategory, minDiscount, sortBy]);
+
+  const filteredProducts = useMemo(() => {
+    return filterMarketplaceProducts(products, {
+      searchQuery,
+      category: selectedCategory,
+      minDiscount,
+      sortBy: sortBy as MarketplaceSort,
+    });
+  }, [products, searchQuery, selectedCategory, minDiscount, sortBy]);
 
   return (
-    <div className="bg-surface-ivory min-h-screen">
-      <div className="max-w-[1440px] mx-auto px-6 lg:px-12 py-12">
-        
+    <div className="min-h-screen py-10 md:py-16">
+      <div className="max-w-[1440px] mx-auto px-6 lg:px-12">
         {/* Header & Search */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 border-b border-border/50 pb-8">
+        <div className="glass-panel-solid rounded-3xl p-6 md:p-8 mb-10 border border-glass-border shadow-sm flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <h1 className="text-4xl font-display font-extrabold text-text-primary mb-3 tracking-tight">Explore Deals</h1>
-            <p className="text-text-secondary text-lg">Find great food near you at better prices.</p>
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="eyebrow">Direct Surplus Marketplace</span>
+              {isLoadingProducts && (
+                <span className="text-[10px] text-brand-forest font-bold animate-pulse flex items-center gap-1">
+                  <RefreshCw size={10} className="animate-spin" /> Syncing with DB...
+                </span>
+              )}
+            </div>
+            <h1 className="text-4xl md:text-5xl font-display font-extrabold text-text-primary tracking-tight">
+              Explore Deals
+            </h1>
+            <p className="text-text-secondary text-sm mt-1">
+              Find premium surplus food from neighborhood partners at discounted prices.
+            </p>
           </div>
-          
+
           <div className="flex items-center gap-3 w-full md:w-auto">
-            <div className="relative flex-grow md:w-96">
-              <input 
-                type="text" 
-                placeholder="Search food or businesses..." 
-                className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-border/80 bg-surface-white focus:outline-none focus:border-brand-forest focus:ring-1 focus:ring-brand-forest transition-all shadow-sm text-sm"
+            <div className="relative flex-grow md:w-80">
+              <input
+                type="text"
+                placeholder="Search bakery, cakes, fruit..."
+                className="w-full pl-10 pr-4 py-3 rounded-2xl border border-glass-border bg-surface-white/90 focus:outline-none focus:ring-2 focus:ring-brand-forest/20 text-xs shadow-sm font-medium"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <Search className="absolute left-4 top-3.5 text-text-secondary" size={20} strokeWidth={2.5} />
+              <Search className="absolute left-3.5 top-3 text-text-secondary" size={17} strokeWidth={2.5} />
             </div>
-            <button 
-              className="p-3.5 bg-surface-white border border-border/80 rounded-xl text-text-secondary hover:text-text-primary hover:border-text-primary transition-colors shadow-sm md:hidden"
+
+            <button
+              type="button"
+              className="p-3 bg-surface-white border border-glass-border rounded-2xl text-text-secondary hover:text-text-primary transition-colors shadow-sm md:hidden cursor-pointer"
               onClick={() => setIsFilterOpen(true)}
             >
-              <SlidersHorizontal size={20} strokeWidth={2.5} />
+              <SlidersHorizontal size={18} strokeWidth={2.5} />
             </button>
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-12">
-          {/* Sidebar / Filters (Desktop) */}
-          <div className={`fixed inset-0 z-50 bg-surface-white lg:static lg:block lg:w-72 lg:bg-transparent lg:z-auto transition-transform duration-300 ${isFilterOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
-            <div className="h-full flex flex-col p-8 lg:p-0">
-              <div className="flex justify-between items-center mb-8 lg:hidden">
-                <h2 className="text-2xl font-bold tracking-tight">Filters</h2>
-                <button onClick={() => setIsFilterOpen(false)} className="p-2 rounded-full hover:bg-surface-ivory transition-colors">
-                  <X size={24} />
+        <div className="flex flex-col lg:flex-row gap-10">
+          {/* Sidebar / Filters */}
+          <div
+            className={`fixed inset-0 z-50 bg-surface-main/95 backdrop-blur-xl lg:static lg:block lg:w-72 lg:bg-transparent lg:z-auto transition-transform duration-300 ${
+              isFilterOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+            }`}
+          >
+            <div className="h-full flex flex-col p-6 lg:p-0">
+              <div className="flex justify-between items-center mb-6 lg:hidden">
+                <h2 className="text-xl font-bold font-display text-text-primary">Filters</h2>
+                <button
+                  type="button"
+                  onClick={() => setIsFilterOpen(false)}
+                  className="p-2 rounded-full hover:bg-surface-secondary transition-colors"
+                >
+                  <X size={20} />
                 </button>
               </div>
-              
-              <div className="flex items-center gap-2 mb-6 text-lg font-semibold text-text-primary">
-                <Filter size={20} className="text-brand-forest" /> Filters
-              </div>
-              
-              <div className="space-y-8 flex-grow lg:flex-grow-0 overflow-y-auto lg:overflow-visible">
+
+              <div className="glass-panel-solid rounded-3xl p-6 border border-glass-border space-y-6">
+                <div className="flex items-center gap-2 text-sm font-bold text-text-primary">
+                  <Filter size={16} className="text-brand-forest" /> Filters & Categories
+                </div>
+
                 {/* Categories */}
                 <div>
-                  <h3 className="font-semibold text-sm uppercase tracking-wider text-text-secondary mb-4">Categories</h3>
-                  <div className="space-y-2">
-                    {categories.map(category => (
-                      <label key={category} className="flex items-center gap-3 cursor-pointer group">
-                        <div className="relative flex items-center justify-center">
-                          <input 
-                            type="radio" 
-                            name="category"
-                            className="peer appearance-none w-5 h-5 border border-border rounded-full checked:border-brand-forest checked:bg-surface-white transition-all cursor-pointer"
-                            checked={selectedCategory === category}
-                            onChange={() => setSelectedCategory(category)}
-                          />
-                          <div className="absolute w-2.5 h-2.5 rounded-full bg-brand-forest opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none"></div>
-                        </div>
-                        <span className={`text-sm ${selectedCategory === category ? 'font-semibold text-brand-forest' : 'text-text-primary group-hover:text-brand-fresh'}`}>
-                          {category}
-                        </span>
-                      </label>
-                    ))}
+                  <h3 className="text-xs uppercase tracking-wider font-extrabold text-text-secondary mb-3">
+                    Categories
+                  </h3>
+                  <div className="space-y-1.5">
+                    {categories.map((category) => {
+                      const isSelected = selectedCategory === category;
+                      return (
+                        <button
+                          key={category}
+                          type="button"
+                          onClick={() => setSelectedCategory(category)}
+                          className={`w-full text-left px-3.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center justify-between ${
+                            isSelected
+                              ? 'bg-brand-forest text-surface-white shadow-sm'
+                              : 'text-text-secondary hover:bg-surface-white/60 hover:text-text-primary'
+                          }`}
+                        >
+                          <span>{category}</span>
+                          {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-brand-lime" />}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
                 {/* Minimum Discount */}
                 <div>
-                  <h3 className="font-semibold text-sm uppercase tracking-wider text-text-secondary mb-4">Minimum Discount</h3>
-                  <div className="space-y-4">
-                    <input 
-                      type="range" 
-                      min="0" 
-                      max="75" 
-                      step="15" 
-                      value={minDiscount} 
-                      onChange={(e) => setMinDiscount(Number(e.target.value))}
-                      className="w-full accent-brand-forest"
-                    />
-                    <div className="flex justify-between text-xs text-text-secondary">
-                      <span>0%</span>
-                      <span>15%</span>
-                      <span>30%</span>
-                      <span>45%</span>
-                      <span>60%</span>
-                      <span>75%</span>
-                    </div>
+                  <div className="flex justify-between items-center mb-2">
+                    <h3 className="text-xs uppercase tracking-wider font-extrabold text-text-secondary">
+                      Min Discount
+                    </h3>
+                    <span className="badge badge-discount text-[10px]">
+                      {minDiscount}%+
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="75"
+                    step="15"
+                    value={minDiscount}
+                    onChange={(e) => setMinDiscount(Number(e.target.value))}
+                    className="w-full accent-brand-forest cursor-pointer"
+                  />
+                  <div className="flex justify-between text-[10px] text-text-secondary mt-1 font-medium">
+                    <span>0%</span>
+                    <span>30%</span>
+                    <span>60%</span>
+                    <span>75%</span>
                   </div>
                 </div>
-              </div>
-              
-              <div className="mt-8 pt-6 border-t border-border flex gap-4 lg:hidden">
-                <button 
-                  className="btn-secondary flex-1"
+
+                {/* Reset Button */}
+                <button
+                  type="button"
                   onClick={() => {
                     setSearchQuery('');
                     setSelectedCategory('All');
                     setMinDiscount(0);
+                    setIsFilterOpen(false);
                   }}
+                  className="btn-secondary w-full py-2.5 text-xs cursor-pointer"
                 >
-                  Clear
+                  Clear Filters
                 </button>
-                <button className="btn-primary flex-1" onClick={() => setIsFilterOpen(false)}>Apply</button>
               </div>
             </div>
           </div>
 
           {/* Main Content */}
           <div className="flex-1">
-            <div className="mb-6 flex justify-between items-center">
-              <p className="text-text-secondary font-medium">
-                Showing <span className="text-text-primary font-bold">{filteredProducts.length}</span> rescue deals
+            <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <p className="text-text-secondary text-sm">
+                Showing{' '}
+                <span className="text-text-primary font-bold">{filteredProducts.length}</span> active rescue deals
               </p>
-              
-              <div className="hidden sm:flex items-center gap-2">
-                <span className="text-sm text-text-secondary">Sort by:</span>
-                  <select value={sortBy} onChange={(event) => setSortBy(event.target.value)} className="bg-surface-white border border-border rounded-lg px-3 py-1.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-forest/50">
-                   <option value="ending-soon">Ending Soon</option>
-                   <option value="discount">Biggest Discount</option>
-                   <option value="price">Lowest Price</option>
-                   <option value="distance">Nearest</option>
-                 </select>
+
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-text-secondary font-medium">Sort by:</span>
+                <select
+                  value={sortBy}
+                  onChange={(event) => setSortBy(event.target.value)}
+                  className="bg-surface-white border border-glass-border rounded-xl px-3 py-1.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-brand-forest/20 cursor-pointer shadow-sm"
+                >
+                  <option value="ending-soon">Ending Soon</option>
+                  <option value="discount">Biggest Discount</option>
+                  <option value="price">Lowest Price</option>
+                  <option value="distance">Nearest Distance</option>
+                </select>
               </div>
             </div>
 
             {filteredProducts.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                {filteredProducts.map(product => (
+                {filteredProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>
             ) : (
-              <div className="bg-surface-white rounded-2xl border border-border p-12 text-center flex flex-col items-center">
-                <div className="w-16 h-16 bg-surface-ivory rounded-full flex items-center justify-center mb-4">
-                  <Search size={24} className="text-text-secondary" />
+              <div className="glass-panel-solid rounded-3xl border border-glass-border p-12 text-center flex flex-col items-center">
+                <div className="w-16 h-16 bg-surface-secondary/80 rounded-2xl flex items-center justify-center mb-4 text-brand-forest">
+                  <Search size={26} />
                 </div>
-                <h3 className="text-xl font-bold text-text-primary mb-2">No deals found</h3>
-                <p className="text-text-secondary max-w-md">
-                  We couldn't find any rescue deals matching your filters. Try adjusting your search or clearing some filters.
+                <h3 className="text-lg font-bold text-text-primary mb-1">No rescue deals found</h3>
+                <p className="text-xs text-text-secondary max-w-sm mb-6">
+                  Try adjusting your keywords or loosening your minimum discount slider.
                 </p>
-                <button 
-                  className="btn-secondary mt-6"
+                <button
+                  type="button"
+                  className="btn-secondary text-xs"
                   onClick={() => {
                     setSearchQuery('');
                     setSelectedCategory('All');
                     setMinDiscount(0);
                   }}
                 >
-                  Clear All Filters
+                  Reset All Filters
                 </button>
               </div>
             )}

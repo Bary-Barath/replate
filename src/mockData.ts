@@ -37,7 +37,7 @@ export const mockProducts: Product[] = [
     storageInfo: 'Store in a cool, dry place.',
     minimumAcceptablePrice: 100,
     availableQuantity: 2,
-    imageUrl: 'https://karu.com.py/storage/productos/854601706287435.jpg',
+    imageUrl: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&q=80&w=800',
     category: 'Bakery',
     distance: '3.5 km',
     isEligibleForSale: true
